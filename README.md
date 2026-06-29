@@ -15,27 +15,18 @@
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="license">
   <img src="https://img.shields.io/badge/python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="python">
   <a href="TESTS.md"><img src="https://img.shields.io/badge/tests-39%20✅-brightgreen?style=flat-square&logo=pytest&logoColor=white" alt="tests"></a>
-  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen?style=flat-square&logo=codecov&logoColor=white" alt="coverage">
-  <img src="https://img.shields.io/badge/code%20style-ruff-261230?style=flat-square&logo=ruff&logoColor=white" alt="code style">
+  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen?style=flat-square" alt="coverage">
+  <img src="https://img.shields.io/badge/code%20style-ruff-261230?style=flat-square" alt="code style">
   <img src="https://img.shields.io/badge/LOC-3,722-orange?style=flat-square" alt="LOC">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/mocasus/trade-agent?style=flat-square&logo=github&label=stars&cacheSeconds=86400" alt="stars">
-  <img src="https://img.shields.io/github/forks/mocasus/trade-agent?style=flat-square&logo=github&label=forks&cacheSeconds=86400" alt="forks">
+  <img src="https://img.shields.io/github/stars/mocasus/trade-agent?style=flat-square&logo=github&label=stars" alt="stars">
+  <img src="https://img.shields.io/github/forks/mocasus/trade-agent?style=flat-square&logo=github&label=forks" alt="forks">
   <img src="https://img.shields.io/github/issues/mocasus/trade-agent?style=flat-square&logo=github&label=issues" alt="issues">
   <img src="https://img.shields.io/github/last-commit/mocasus/trade-agent?style=flat-square&logo=git&label=last%20commit" alt="last commit">
-  <img src="https://img.shields.io/github/repo-size/mocasus/trade-agent?style=flat-square&logo=github&label=size" alt="repo size">
-  <img src="https://img.shields.io/github/languages/count/mocasus/trade-agent?style=flat-square&logo=github&label=languages" alt="languages">
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL-5996B8?style=flat-square&logo=linux&logoColor=white" alt="platform">
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL-lightgrey?style=flat-square" alt="platform">
   <img src="https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker&logoColor=white" alt="docker">
-  <img src="https://img.shields.io/badge/systemd-service-3DA6E8?style=flat-square&logo=systemd&logoColor=white" alt="systemd">
-  <img src="https://img.shields.io/badge/SQLite-storage-003B57?style=flat-square&logo=sqlite&logoColor=white" alt="sqlite">
-  <img src="https://img.shields.io/badge/ccxt-100%2B%20exchanges-42C8D0?style=flat-square&logo=binance&logoColor=white" alt="ccxt">
-  <img src="https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square&logo=github&logoColor=white" alt="PRs welcome">
 </p>
 
 ---
