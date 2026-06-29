@@ -4,8 +4,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from ...interfaces import ExchangeInterface
-from ...models import Balance, Order, OrderResult, OrderSide, OrderType, Position
+from trade_agent.interfaces import ExchangeInterface
+from trade_agent.models import Balance, Order, OrderResult, OrderSide, OrderType, Position
 
 
 class PaperExchange(ExchangeInterface):

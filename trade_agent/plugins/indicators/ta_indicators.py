@@ -5,8 +5,8 @@ from typing import Any
 
 import numpy as np
 
-from ...interfaces import IndicatorPluginInterface
-from ...models import Candle, Indicators
+from trade_agent.interfaces import IndicatorPluginInterface
+from trade_agent.models import Candle, Indicators
 
 
 class TAIndicators(IndicatorPluginInterface):

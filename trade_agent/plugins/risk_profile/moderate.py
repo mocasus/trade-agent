@@ -1,6 +1,6 @@
 """Moderate risk profile plugin."""
-from ...interfaces import RiskProfileInterface
-from ...models import Decision, MarketContext, Position
+from trade_agent.interfaces import RiskProfileInterface
+from trade_agent.models import Decision, MarketContext, Position
 
 
 class ModerateProfile(RiskProfileInterface):

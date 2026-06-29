@@ -4,8 +4,8 @@ import logging
 import threading
 from typing import Any
 import httpx
-from ...interfaces import NotifierInterface
-from ...models import Event, Report
+from trade_agent.interfaces import NotifierInterface
+from trade_agent.models import Event, Report
 
 logger = logging.getLogger("trade-agent.notifier.telegram")
 

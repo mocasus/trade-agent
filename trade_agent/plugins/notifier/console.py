@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...interfaces import NotifierInterface
-from ...models import Event, Report
+from trade_agent.interfaces import NotifierInterface
+from trade_agent.models import Event, Report
 
 
 class ConsoleNotifier(NotifierInterface):

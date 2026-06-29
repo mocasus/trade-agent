@@ -5,8 +5,8 @@ import csv
 from pathlib import Path
 from typing import Any
 
-from ...interfaces import DataSourceInterface
-from ...models import Candle, OrderBook, Ticker
+from trade_agent.interfaces import DataSourceInterface
+from trade_agent.models import Candle, OrderBook, Ticker
 
 
 class CSVSource(DataSourceInterface):

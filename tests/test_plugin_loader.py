@@ -8,8 +8,13 @@ BUILTIN = Path(__file__).parent.parent / "trade_agent" / "plugins"
 def test_discover_data_source():
     loader = PluginLoader(BUILTIN)
     available = loader.get_available("data_source")
-    assert "ccxt" in available
     assert "csv" in available
+    # ccxt requires the ccxt package to be installed
+    try:
+        import ccxt
+        assert "ccxt" in available
+    except ImportError:
+        pass  # ccxt not installed, skip that assertion
 
 
 def test_discover_strategy():

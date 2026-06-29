@@ -4,8 +4,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ...interfaces import StrategyInterface
-from ...models import Action, Decision, MarketContext
+from trade_agent.interfaces import StrategyInterface
+from trade_agent.models import Action, Decision, MarketContext
 
 logger = logging.getLogger("trade-agent.strategy.rule")
 

@@ -8,8 +8,8 @@ from typing import Any
 
 from openai import OpenAI
 
-from ...interfaces import StrategyInterface
-from ...models import Action, Decision, MarketContext
+from trade_agent.interfaces import StrategyInterface
+from trade_agent.models import Action, Decision, MarketContext
 
 logger = logging.getLogger("trade-agent.strategy.llm")
 

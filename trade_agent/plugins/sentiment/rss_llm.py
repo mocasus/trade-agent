@@ -11,8 +11,8 @@ from typing import Any
 import httpx
 from openai import OpenAI
 
-from ...interfaces import SentimentInterface
-from ...models import SentimentScore
+from trade_agent.interfaces import SentimentInterface
+from trade_agent.models import SentimentScore
 
 logger = logging.getLogger("trade-agent.sentiment.rss_llm")
 

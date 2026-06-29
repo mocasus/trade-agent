@@ -5,8 +5,8 @@ from typing import Any
 
 import ccxt
 
-from ...interfaces import DataSourceInterface
-from ...models import Candle, OrderBook, Ticker
+from trade_agent.interfaces import DataSourceInterface
+from trade_agent.models import Candle, OrderBook, Ticker
 
 
 class CCXTSource(DataSourceInterface):

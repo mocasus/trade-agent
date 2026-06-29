@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...interfaces import SentimentInterface
-from ...models import SentimentScore
+from trade_agent.interfaces import SentimentInterface
+from trade_agent.models import SentimentScore
 
 
 class NoneSentiment(SentimentInterface):
