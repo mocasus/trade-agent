@@ -269,3 +269,13 @@ class Storage:
             "win_rate": winning / max(total_trades, 1) * 100,
             "total_pnl": total_pnl,
         }
+
+    def get_positions(self) -> list[dict]:
+        cur = self.conn.cursor()
+        cur.execute("SELECT symbol, side, quantity, entry_price, unrealized_pnl FROM positions")
+        return [dict(zip(["symbol", "side", "quantity", "entry_price", "unrealized_pnl"], row)) for row in cur.fetchall()]
+
+    def get_daily_pnl(self) -> list[dict]:
+        cur = self.conn.cursor()
+        cur.execute("SELECT date(timestamp) as day, sum(pnl) as pnl FROM trades GROUP BY day ORDER BY day DESC LIMIT 30")
+        return [dict(zip(["day", "pnl"], row)) for row in cur.fetchall()]

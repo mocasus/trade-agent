@@ -22,6 +22,9 @@ class Action(str, Enum):
 class OrderType(str, Enum):
     MARKET = "market"
     LIMIT = "limit"
+    STOP = "stop"
+    OCO = "oco"
+    PARTIAL_EXIT = "partial_exit"
 
 
 class OrderSide(str, Enum):
@@ -213,3 +216,26 @@ class Report:
     period_start: float
     period_end: float
     metadata: dict[str, Any] = field(default_factory=dict)
+
+
+class OCOOrder:
+    """One-Cancels-Other order: stop + limit linked."""
+    def __init__(self, symbol: str, side: str, quantity: float,
+                 stop_price: float, limit_price: float,
+                 order_id: str = "", linked_order_id: str = ""):
+        self.symbol = symbol
+        self.side = side
+        self.quantity = quantity
+        self.stop_price = stop_price
+        self.limit_price = limit_price
+        self.order_id = order_id
+        self.linked_order_id = linked_order_id
+
+class PartialExit:
+    """Partial position exit with remaining quantity tracking."""
+    def __init__(self, position_id: str, exit_percentage: float,
+                 exit_price: float, remaining_quantity: float):
+        self.position_id = position_id
+        self.exit_percentage = exit_percentage
+        self.exit_price = exit_price
+        self.remaining_quantity = remaining_quantity

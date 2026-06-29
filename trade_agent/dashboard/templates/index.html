@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trade Agent Dashboard</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1a2e; color: #eee; font-family: -apple-system, monospace; }
+.header { background: #16213e; padding: 1rem 2rem; border-bottom: 2px solid #e94560; }
+.header h1 { color: #e94560; font-size: 1.4rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; padding: 1rem 2rem; }
+.card { background: #16213e; border-radius: 8px; padding: 1.2rem; border: 1px solid #0f3460; }
+.card h2 { color: #e94560; font-size: 0.9rem; margin-bottom: 0.8rem; letter-spacing: 1px; }
+.stat { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #0f3460; }
+.stat-label { color: #888; font-size: 0.8rem; }
+.stat-value { color: #eee; font-size: 0.9rem; font-weight: bold; }
+.positive { color: #4ecca3; }
+.negative { color: #e94560; }
+table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+th { color: #888; text-align: left; padding: 0.5rem; border-bottom: 1px solid #0f3460; }
+td { padding: 0.4rem 0.5rem; }
+canvas { width: 100%; height: 200px; }
+</style>
+</head>
+<body>
+<div class="header"><h1>Trade Agent</h1></div>
+<div class="grid">
+  <div class="card"><h2>PORTFOLIO</h2>
+    <div id="portfolio"><div class="stat"><span class="stat-label">Total PnL</span><span class="stat-value" id="total-pnl">--</span></div>
+    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="win-rate">--</span></div>
+    <div class="stat"><span class="stat-label">Total Trades</span><span class="stat-value" id="total-trades">--</span></div>
+    <div class="stat"><span class="stat-label">Status</span><span class="stat-value" id="status">--</span></div></div>
+  </div>
+  <div class="card"><h2>DAILY PNL</h2><canvas id="pnl-chart"></canvas></div>
+  <div class="card"><h2>POSITIONS</h2><table id="pos-table"><thead><tr><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>PnL</th></tr></thead><tbody></tbody></table></div>
+  <div class="card"><h2>RECENT TRADES</h2><table id="trade-table"><thead><tr><th>Time</th><th>Symbol</th><th>Side</th><th>Qty</th><th>PnL</th></tr></thead><tbody></tbody></table></div>
+</div>
+<script>
+async function refresh() {
+  try {
+    const status = await fetch("/api/status").then(r => r.json());
+    document.getElementById("total-pnl").textContent = "$" + (status.total_pnl || 0).toFixed(2);
+    document.getElementById("total-pnl").className = "stat-value " + (status.total_pnl >= 0 ? "positive" : "negative");
+    document.getElementById("win-rate").textContent = (status.win_rate || 0).toFixed(1) + "%";
+    document.getElementById("total-trades").textContent = status.total_trades || 0;
+    document.getElementById("status").textContent = status.status || "--";
+  } catch(e) {}
+
+  try {
+    const positions = await fetch("/api/positions").then(r => r.json());
+    const tbody = document.querySelector("#pos-table tbody");
+    tbody.innerHTML = "";
+    (positions.positions || []).forEach(p => {
+      const cls = p.unrealized_pnl >= 0 ? "positive" : "negative";
+      tbody.innerHTML += `<tr><td>${p.symbol}</td><td>${p.side}</td><td>${p.quantity}</td><td>${p.entry_price}</td><td class="${cls}">${p.unrealized_pnl}</td></tr>`;
+    });
+  } catch(e) {}
+
+  try {
+    const trades = await fetch("/api/trades").then(r => r.json());
+    const tbody = document.querySelector("#trade-table tbody");
+    tbody.innerHTML = "";
+    (trades.trades || []).slice(0, 20).forEach(t => {
+      const cls = (t.pnl || 0) >= 0 ? "positive" : "negative";
+      tbody.innerHTML += `<tr><td>${t.timestamp || ""}</td><td>${t.symbol}</td><td>${t.side}</td><td>${t.quantity}</td><td class="${cls}">${(t.pnl || 0).toFixed(2)}</td></tr>`;
+    });
+  } catch(e) {}
+}
+refresh();
+setInterval(refresh, 30000);
+</script>
+</body>
+</html>

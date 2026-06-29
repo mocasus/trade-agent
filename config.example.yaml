@@ -1,194 +1,217 @@
-# Trade Agent Configuration
-# Full template with all options documented.
-# Copy to config.yaml and edit before running.
-
-# ── General ──────────────────────────────────────────────────
 agent:
-  name: "trade-agent-v1"          # Instance name
-  log_level: "INFO"               # DEBUG | INFO | WARNING | ERROR
-  log_file: "~/.trade-agent/logs/agent.log"
-  data_dir: "~/.trade-agent"      # Base dir for DB, plugins, logs
-  timezone: "Asia/Jakarta"
-
-# ── Plugin Registry ──────────────────────────────────────────
-# Each slot selects which plugin to load. Built-in plugins are
-# referenced by name; custom plugins by module name in plugins/ dir.
+  name: trade-agent-v1
+  log_level: INFO
+  log_file: ~/.trade-agent/logs/agent.log
+  data_dir: ~/.trade-agent
+  timezone: Asia/Jakarta
 plugins:
-  data_source: "ccxt"             # ccxt | csv
-  strategy: "llm"                 # llm | rule
-  exchange: "paper"               # ccxt | paper (START WITH paper!)
-  notifier: ["console"]           # console | telegram | webhook (list = multiple)
-  sentiment: "none"               # rss_llm | none
-  risk_profile: "moderate"        # conservative | moderate | aggressive
-  indicators: "ta"                # ta
-
-# ── Data Source ──────────────────────────────────────────────
+  data_source: ccxt
+  strategy: llm
+  exchange: paper
+  notifier:
+  - console
+  sentiment: none
+  risk_profile: moderate
+  indicators: ta
 data_source:
-  # CCXT settings (when plugins.data_source = "ccxt")
-  exchange: "binance"             # binance | bybit | okx | kraken | ...
-  api_key: "${BINANCE_API_KEY}"   # Resolved from .env
-  api_secret: "${BINANCE_API_SECRET}"
-  testnet: true                   # USE TESTNET FIRST!
+  exchange: binance
+  api_key: ${BINANCE_API_KEY}
+  api_secret: ${BINANCE_API_SECRET}
+  testnet: true
   rate_limit: true
-  # CSV settings (when plugins.data_source = "csv")
-  csv_path: "~/.trade-agent/data/history.csv"
-  csv_format: "binance_klines"    # binance_klines | generic_ohlcv
-
-# ── Strategy ─────────────────────────────────────────────────
+  csv_path: ~/.trade-agent/data/history.csv
+  csv_format: binance_klines
 strategy:
-  # LLM strategy (when plugins.strategy = "llm")
   ai:
-    base_url: "${AI_BASE_URL}"    # Any OpenAI-compatible endpoint
-    api_key: "${AI_API_KEY}"
-    model: "gpt-4o-mini"          # Or local: llama, qwen, glm, etc.
-    temperature: 0.3              # Low = consistent decisions
+    base_url: ${AI_BASE_URL}
+    api_key: ${AI_API_KEY}
+    model: gpt-4o-mini
+    temperature: 0.3
     max_tokens: 500
     timeout_seconds: 30
     retry_on_failure: 2
-    fallback_model: "gpt-4o-mini"
-  # Prompt customization
+    fallback_model: gpt-4o-mini
   prompt:
-    template: "default"           # default | conservative | aggressive
-    custom_template: ""           # Path to custom .md template
-    system_prompt: "You are a disciplined trading analyst. Always respond with valid JSON."
+    template: default
+    custom_template: ''
+    system_prompt: You are a disciplined trading analyst. Always respond with valid
+      JSON.
     include_indicators: true
     include_news: true
     include_portfolio: true
     include_reasoning_chain: false
     max_news_items: 5
-    indicator_set: ["rsi", "macd", "ema_20", "ema_50", "bb"]
-    timeframe_context: ["15m", "1h", "4h"]
-  # Decision parsing
+    indicator_set:
+    - rsi
+    - macd
+    - ema_20
+    - ema_50
+    - bb
+    timeframe_context:
+    - 15m
+    - 1h
+    - 4h
   decision:
-    action_types: ["BUY", "SELL", "HOLD", "CLOSE_ALL"]
-    confidence_threshold: 65      # Min confidence to execute (0-100)
+    action_types:
+    - BUY
+    - SELL
+    - HOLD
+    - CLOSE_ALL
+    confidence_threshold: 65
     require_reasoning: true
-    max_amount_pct: 15            # Cap: LLM can't request more than this %
-  # Rule strategy (when plugins.strategy = "rule")
+    max_amount_pct: 15
   rules:
-    - name: "rsi_oversold"
-      condition: "rsi < 30"
-      action: "BUY"
-      amount_pct: 5
-      confidence: 70
-    - name: "rsi_overbought"
-      condition: "rsi > 70"
-      action: "SELL"
-      amount_pct: 5
-      confidence: 70
-
-# ── Risk Profile ─────────────────────────────────────────────
+  - name: rsi_oversold
+    condition: rsi < 30
+    action: BUY
+    amount_pct: 5
+    confidence: 70
+  - name: rsi_overbought
+    condition: rsi > 70
+    action: SELL
+    amount_pct: 5
+    confidence: 70
+  partial_exit_levels:
+  - pct_gain: 5.0
+    exit_pct: 25
+  - pct_gain: 10.0
+    exit_pct: 25
+  - pct_gain: 15.0
+    exit_pct: 50
+  rule_builder:
+    rules:
+    - signal: btc_rsi
+      condition: rsi_below
+      threshold: 30
+      action: buy
+      confidence_weight: 0.6
 risk:
-  profile: "moderate"             # conservative | moderate | aggressive
-  # Override any profile setting:
+  profile: moderate
   position_sizing:
-    method: "fixed_pct"           # fixed_pct | kelly | volatility_adjusted
+    method: fixed_pct
     max_pct: 8
     min_pct: 1
   stop_loss:
-    method: "atr"                 # fixed_pct | atr | trailing
+    method: atr
     atr_multiplier: 1.5
     fixed_pct: 2
     trailing_pct: 1.5
     trailing_activation_pct: 1
   take_profit:
-    method: "rr_ratio"            # fixed_pct | rr_ratio | partial
+    method: rr_ratio
     rr_ratio: 2
     fixed_pct: 4
     partial_exit_steps: []
   daily_limits:
-    max_loss_pct: 5               # Stop trading if daily loss > 5%
-    max_trades: 20                # Max trades per day
-    max_open_positions: 5         # Max concurrent open positions
-    cooldown_minutes: 30          # Min time between trades per symbol
-    max_consecutive_losses: 3     # Pause after N consecutive losses
+    max_loss_pct: 5
+    max_trades: 20
+    max_open_positions: 5
+    cooldown_minutes: 30
+    max_consecutive_losses: 3
   portfolio:
-    reserve_pct: 10               # Keep 10% as reserve (never trade)
-
-# ── Trading ──────────────────────────────────────────────────
+    reserve_pct: 10
+  trailing_stop:
+    trail_percent: 2.0
+    activation_threshold: 1.0
+    description: Trailing stop-loss that moves up with price
+  kelly:
+    fraction: 0.5
+    min_samples: 10
+    default_win_rate: 0.55
+    description: Fractional Kelly criterion for position sizing
 trading:
   symbols:
-    - symbol: "BTCUSDT"
-      enabled: true
-      timeframe: "15m"
-      strategy_override: ""       # Different strategy for specific symbol
-      risk_override: ""           # Different risk profile for specific symbol
-    - symbol: "ETHUSDT"
-      enabled: true
-      timeframe: "15m"
-    - symbol: "SOLUSDT"
-      enabled: false              # Disabled but configured
-      timeframe: "5m"
-  paper_mode: true                # MUST be true for first runs!
-  fee_pct: 0.1                   # Trading fee for P&L calc
-  slippage_pct: 0.05             # Expected slippage for paper mode
-
-# ── Sentiment ────────────────────────────────────────────────
+  - symbol: BTCUSDT
+    enabled: true
+    timeframe: 15m
+    strategy_override: ''
+    risk_override: ''
+  - symbol: ETHUSDT
+    enabled: true
+    timeframe: 15m
+  - symbol: SOLUSDT
+    enabled: false
+    timeframe: 5m
+  paper_mode: true
+  fee_pct: 0.1
+  slippage_pct: 0.05
 sentiment:
   enabled: true
   feeds:
-    - url: "https://cryptoslate.com/feed/"
-      weight: 1.0
-    - url: "https://www.coindesk.com/arc/outboundfeeds/rss/"
-      weight: 1.0
-    - url: "https://cointelegraph.com/rss"
-      weight: 0.8
+  - url: https://cryptoslate.com/feed/
+    weight: 1.0
+  - url: https://www.coindesk.com/arc/outboundfeeds/rss/
+    weight: 1.0
+  - url: https://cointelegraph.com/rss
+    weight: 0.8
   max_items: 10
   cache_hours: 2
   symbol_filter: true
-  sentiment_prompt: "brief"
-  sentiment_model_override: ""   # Use cheaper model for sentiment
-
-# ── Notifiers ────────────────────────────────────────────────
+  sentiment_prompt: brief
+  sentiment_model_override: ''
 notifiers:
   telegram:
-    bot_token: "${TG_BOT_TOKEN}"
-    chat_id: "${TG_CHAT_ID}"
-    alerts: [trade, stop_loss, daily_report, error, kill_switch]
-    commands: true                # Enable /start, /stop, /status, /portfolio
-    daily_report_time: "21:00"
-    daily_report_timezone: "Asia/Jakarta"
+    bot_token: ${TG_BOT_TOKEN}
+    chat_id: ${TG_CHAT_ID}
+    alerts:
+    - trade
+    - stop_loss
+    - daily_report
+    - error
+    - kill_switch
+    commands: true
+    daily_report_time: '21:00'
+    daily_report_timezone: Asia/Jakarta
   discord:
-    webhook_url: "${DISCORD_WEBHOOK}"
-    alerts: [trade, stop_loss, error]
+    webhook_url: ${DISCORD_WEBHOOK}
+    alerts:
+    - trade
+    - stop_loss
+    - error
   webhook:
-    url: "https://your-server.com/api/trade-alert"
-    method: "POST"
+    url: https://your-server.com/api/trade-alert
+    method: POST
     headers:
-      Authorization: "Bearer ${WEBHOOK_TOKEN}"
-    alerts: [trade, stop_loss]
+      Authorization: Bearer ${WEBHOOK_TOKEN}
+    alerts:
+    - trade
+    - stop_loss
   console:
-    alerts: [all]                 # Print everything to stdout
-
-# ── Scheduling ───────────────────────────────────────────────
+    alerts:
+    - all
 schedule:
-  interval_minutes: 15            # Run main loop every N minutes
-  backfill_on_start: true         # Fetch recent candles on startup
-  missed_ticks_grace: 5           # Process up to N missed ticks
-
-# ── Backtesting ──────────────────────────────────────────────
+  interval_minutes: 15
+  backfill_on_start: true
+  missed_ticks_grace: 5
 backtest:
-  start_date: "2025-01-01"
-  end_date: "2025-06-01"
+  start_date: '2025-01-01'
+  end_date: '2025-06-01'
   initial_capital: 10000
-  symbols: ["BTCUSDT"]
-  timeframe: "15m"
-  strategy: "llm"
-  paper_mode: true                # Always true for backtest
-  output_format: "json"
-  output_path: "~/.trade-agent/backtest-results/"
-
-# ── Storage ──────────────────────────────────────────────────
+  symbols:
+  - BTCUSDT
+  timeframe: 15m
+  strategy: llm
+  paper_mode: true
+  output_format: json
+  output_path: ~/.trade-agent/backtest-results/
 storage:
-  db_path: "~/.trade-agent/trade-agent.db"
+  db_path: ~/.trade-agent/trade-agent.db
   backup_on_start: true
-  backup_dir: "~/.trade-agent/backups/"
+  backup_dir: ~/.trade-agent/backups/
   retention_days: 90
-
-# ── Safety ───────────────────────────────────────────────────
 safety:
-  paper_mode_required_first_run: true  # Force paper mode for first 24h
-  kill_switch_enabled: true            # Telegram /stop command
-  auto_stop_on_error: true             # Halt on unhandled exception
-  max_api_failures: 5                  # Stop after N consecutive API failures
-  notify_on_kill: true                 # Alert when agent is killed
+  paper_mode_required_first_run: true
+  kill_switch_enabled: true
+  auto_stop_on_error: true
+  max_api_failures: 5
+  notify_on_kill: true
+exchange:
+  bybit_futures:
+    leverage: 10
+    margin_mode: cross
+    position_mode: one-way
+    testnet: false
+    description: Bybit USDT perpetual futures
+dashboard:
+  port: 8080
+  theme: dark

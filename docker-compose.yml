@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  trade-agent:
+    build: .
+    env_file: .env
+    volumes:
+      - trade-data:/app/data
+      - ./config.yaml:/app/config.yaml:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://dashboard:8080/api/status')"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+  dashboard:
+    build: .
+    command: ["python3", "-m", "trade_agent.dashboard.server"]
+    ports:
+      - "8080:8080"
+    env_file: .env
+    volumes:
+      - trade-data:/app/data:ro
+      - ./config.yaml:/app/config.yaml:ro
+    restart: unless-stopped
+
+volumes:
+  trade-data:
