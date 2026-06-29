@@ -1,0 +1,12 @@
+# Prerequisites
+.env
+config.yaml
+*.db
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.DS_Store
