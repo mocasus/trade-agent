@@ -1,0 +1,12 @@
+# Core dependencies (required)
+ccxt>=4.0
+pyyaml>=6.0
+openai>=1.0
+httpx>=0.24
+apscheduler>=3.10
+
+# Indicators (optional — falls back to manual calc if not installed)
+pandas-ta>=0.3
+
+# Telegram notifier (only if using telegram plugin)
+python-telegram-bot>=20.0

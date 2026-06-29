@@ -1,0 +1,22 @@
+[Unit]
+Description=Trade Agent — AI Trading Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/trade-agent
+EnvironmentFile=/opt/trade-agent/.env
+ExecStart=/opt/trade-agent/venv/bin/python -m trade_agent --config /opt/trade-agent/config.yaml
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+# Safety
+TimeoutStopSec=30
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target
