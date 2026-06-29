@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square" alt="version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="license">
   <img src="https://img.shields.io/badge/python-3.11+-3776AB?style=flat-square" alt="python">
-  <img src="https://img.shields.io/badge/tests-39%20passed-brightgreen?style=flat-square" alt="tests">
+  <a href="TESTS.md"><img src="https://img.shields.io/badge/tests-39%20passed-brightgreen?style=flat-square" alt="tests"></a>
   <img src="https://img.shields.io/badge/LOC-3,722-orange?style=flat-square" alt="LOC">
 </p>
 
@@ -238,6 +238,8 @@ python -m trade_agent.backtest --config config.yaml
 ```
 
 Outputs: total return, win rate, Sharpe ratio, max drawdown.
+
+📋 **[Full test results →](TESTS.md)** — 39 tests, 7 suites, all passing.
 
 ## Deploy
 
