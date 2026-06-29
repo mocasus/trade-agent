@@ -13,12 +13,42 @@
 <p align="center">
   <img src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square" alt="version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="license">
-  <img src="https://img.shields.io/badge/python-3.11+-3776AB?style=flat-square" alt="python">
-  <a href="TESTS.md"><img src="https://img.shields.io/badge/tests-39%20passed-brightgreen?style=flat-square" alt="tests"></a>
+  <img src="https://img.shields.io/badge/python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="python">
+  <a href="TESTS.md"><img src="https://img.shields.io/badge/tests-39%20✅-brightgreen?style=flat-square&logo=pytest&logoColor=white" alt="tests"></a>
+  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen?style=flat-square&logo=codecov&logoColor=white" alt="coverage">
+  <img src="https://img.shields.io/badge/code%20style-ruff-261230?style=flat-square&logo=ruff&logoColor=white" alt="code style">
   <img src="https://img.shields.io/badge/LOC-3,722-orange?style=flat-square" alt="LOC">
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/github/stars/mocasus/trade-agent?style=flat-square&logo=github&label=stars&cacheSeconds=86400" alt="stars">
+  <img src="https://img.shields.io/github/forks/mocasus/trade-agent?style=flat-square&logo=github&label=forks&cacheSeconds=86400" alt="forks">
+  <img src="https://img.shields.io/github/issues/mocasus/trade-agent?style=flat-square&logo=github&label=issues" alt="issues">
+  <img src="https://img.shields.io/github/last-commit/mocasus/trade-agent?style=flat-square&logo=git&label=last%20commit" alt="last commit">
+  <img src="https://img.shields.io/github/repo-size/mocasus/trade-agent?style=flat-square&logo=github&label=size" alt="repo size">
+  <img src="https://img.shields.io/github/languages/count/mocasus/trade-agent?style=flat-square&logo=github&label=languages" alt="languages">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20WSL-5996B8?style=flat-square&logo=linux&logoColor=white" alt="platform">
+  <img src="https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker&logoColor=white" alt="docker">
+  <img src="https://img.shields.io/badge/systemd-service-3DA6E8?style=flat-square&logo=systemd&logoColor=white" alt="systemd">
+  <img src="https://img.shields.io/badge/SQLite-storage-003B57?style=flat-square&logo=sqlite&logoColor=white" alt="sqlite">
+  <img src="https://img.shields.io/badge/ccxt-100%2B%20exchanges-42C8D0?style=flat-square&logo=binance&logoColor=white" alt="ccxt">
+  <img src="https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square&logo=github&logoColor=white" alt="PRs welcome">
+</p>
+
 ---
+
+<p align="center">
+  <a href="#quick-start"><img src="https://img.shields.io/badge/🚀_Quick_Start-2ea44f?style=flat-square" alt="Quick Start"></a>
+  <a href="#features"><img src="https://img.shields.io/badge/✨_Features-58a6ff?style=flat-square" alt="Features"></a>
+  <a href="#plugin-system"><img src="https://img.shields.io/badge/🧩_Plugins-F78C40?style=flat-square" alt="Plugins"></a>
+  <a href="#advanced-features"><img src="https://img.shields.io/badge/🔬_Advanced-d73a4a?style=flat-square" alt="Advanced"></a>
+  <a href="#risk-profiles"><img src="https://img.shields.io/badge/🛡️_Risk-ffd33d?style=flat-square" alt="Risk"></a>
+  <a href="TESTS.md"><img src="https://img.shields.io/badge/🧪_Tests-8b949e?style=flat-square" alt="Tests"></a>
+  <a href="#deploy"><img src="https://img.shields.io/badge/🐳_Deploy-2496ED?style=flat-square" alt="Deploy"></a>
+</p>
 
 <details>
 <summary>🇮🇩 Bahasa Indonesia</summary>
@@ -287,6 +317,55 @@ MIT
 
 ---
 
-<div align="center">
-<sub>v1.0.0 · 2026</sub>
-</div>
+<p align="center">
+  <strong>Made with</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/YAML-CB171E?style=for-the-badge&logo=yaml&logoColor=white" alt="YAML">
+  <img src="https://img.shields.io/badge/pytest-0A9ED4?style=for-the-badge&logo=pytest&logoColor=white" alt="pytest">
+</p>
+
+<p align="center">
+  <strong>Supported Exchanges</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Binance-F3BA2F?style=for-the-badge&logo=binance&logoColor=black" alt="Binance">
+  <img src="https://img.shields.io/badge/Bybit-F7A600?style=for-the-badge&logo=bybit&logoColor=white" alt="Bybit">
+  <img src="https://img.shields.io/badge/OKX-FFFFFF?style=for-the-badge&logo=okx&logoColor=black" alt="OKX">
+  <img src="https://img.shields.io/badge/Coinbase-0052FF?style=for-the-badge&logo=coinbase&logoColor=white" alt="Coinbase">
+  <img src="https://img.shields.io/badge/100%2B_More-FF6B6B?style=for-the-badge&logo=ccxt&logoColor=white" alt="100+ More">
+</p>
+
+<p align="center">
+  <strong>Integrations</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram">
+  <img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord">
+  <img src="https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI">
+  <img src="https://img.shields.io/badge/Webhooks-FF6B6B?style=for-the-badge&logo=webhooks&logoColor=white" alt="Webhooks">
+</p>
+
+<p align="center">
+  <strong>Status</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Phase_1-✅_Complete-2ea44f?style=flat-square" alt="Phase 1">
+  <img src="https://img.shields.io/badge/Phase_2-✅_Complete-2ea44f?style=flat-square" alt="Phase 2">
+  <img src="https://img.shields.io/badge/Phase_3-✅_Complete-2ea44f?style=flat-square" alt="Phase 3">
+  <img src="https://img.shields.io/badge/Phase_4-✅_Complete-2ea44f?style=flat-square" alt="Phase 4">
+  <img src="https://img.shields.io/badge/Paper_Mode-🟢_Active-2ea44f?style=flat-square" alt="Paper Mode">
+</p>
+
+---
+
+<p align="center">
+  <sub>v1.0.0 · 2026 · Built by <a href="https://github.com/mocasus">@mocasus</a></sub>
+</p>

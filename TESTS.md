@@ -1,4 +1,21 @@
-![tests](https://img.shields.io/badge/tests-39%20passed-brightgreen?style=flat-square) ![python](https://img.shields.io/badge/python-3.11.2-3776AB?style=flat-square) ![pytest](https://img.shields.io/badge/pytest-9.1.1-0A9ED4?style=flat-square)
+<p align="center">
+  <img src="https://img.shields.io/badge/tests-39%20passed-brightgreen?style=flat-square&logo=pytest&logoColor=white" alt="tests">
+  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen?style=flat-square&logo=codecov&logoColor=white" alt="coverage">
+  <img src="https://img.shields.io/badge/python-3.11.2-3776AB?style=flat-square&logo=python&logoColor=white" alt="python">
+  <img src="https://img.shields.io/badge/pytest-9.1.1-0A9ED4?style=flat-square&logo=pytest&logoColor=white" alt="pytest">
+  <img src="https://img.shields.io/badge/suites-7-58a6ff?style=flat-square&logo=github&logoColor=white" alt="suites">
+  <img src="https://img.shields.io/badge/runtime-0.86s-ffd33d?style=flat-square&logo=clockify&logoColor=white" alt="runtime">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/config-5%20✅-2ea44f?style=flat-square" alt="config">
+  <img src="https://img.shields.io/badge/models-7%20✅-2ea44f?style=flat-square" alt="models">
+  <img src="https://img.shields.io/badge/phase3-9%20✅-2ea44f?style=flat-square" alt="phase3">
+  <img src="https://img.shields.io/badge/phase4-3%20✅-2ea44f?style=flat-square" alt="phase4">
+  <img src="https://img.shields.io/badge/plugins-5%20✅-2ea44f?style=flat-square" alt="plugins">
+  <img src="https://img.shields.io/badge/risk-7%20✅-2ea44f?style=flat-square" alt="risk">
+  <img src="https://img.shields.io/badge/storage-3%20✅-2ea44f?style=flat-square" alt="storage">
+</p>
 
 # 🧪 Test Results
 
@@ -156,6 +173,11 @@ tests/test_storage.py::test_log_trade PASSED                             [100%]
 
 ---
 
-<div align="center">
-<sub>Last updated: 2026-06-30 · Run `python -m pytest tests/ -v` to reproduce</sub>
-</div>
+<p align="center">
+  <a href="README.md"><img src="https://img.shields.io/badge/←_Back_to_README-2ea44f?style=flat-square&logo=github&logoColor=white" alt="Back to README"></a>
+  <img src="https://img.shields.io/badge/last_run-2026--06--30-8b949e?style=flat-square&logo=calendar&logoColor=white" alt="last run">
+</p>
+
+<p align="center">
+  <sub>Run <code>python -m pytest tests/ -v</code> to reproduce · Part of <a href="README.md">Trade Agent</a></sub>
+</p>
