@@ -14,6 +14,7 @@
   <img src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square" alt="version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="license">
   <img src="https://img.shields.io/badge/python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="python">
+  <a href="https://github.com/mocasus/trade-agent/actions/workflows/ci.yml"><img src="https://github.com/mocasus/trade-agent/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="TESTS.md"><img src="https://img.shields.io/badge/tests-39%20✅-brightgreen?style=flat-square&logo=pytest&logoColor=white" alt="tests"></a>
   <img src="https://img.shields.io/badge/coverage-100%25-brightgreen?style=flat-square" alt="coverage">
   <img src="https://img.shields.io/badge/code%20style-ruff-261230?style=flat-square" alt="code style">
