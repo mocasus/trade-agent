@@ -1,10 +1,10 @@
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "trade-agent"
-version = "0.1.0"
+version = "1.0.0"
 description = "AI-powered modular trading agent with plugin system"
 readme = "README.md"
 license = "MIT"
