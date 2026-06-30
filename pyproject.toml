@@ -22,10 +22,9 @@ dependencies = [
 
 [project.optional-dependencies]
 telegram = ["python-telegram-bot>=20.0"]
-indicators = ["pandas-ta>=0.3"]
+indicators = ["pandas-ta>=0.3; python_version<'3.13'"]
 all = [
     "python-telegram-bot>=20.0",
-    "pandas-ta>=0.3",
 ]
 
 [project.scripts]
