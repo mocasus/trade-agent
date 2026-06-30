@@ -1,4 +1,5 @@
 """Disabled sentiment plugin — returns None."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -22,4 +23,8 @@ class NoneSentiment(SentimentInterface):
 
 
 def register():
-    return {"name": "none", "class": NoneSentiment, "description": "Disable sentiment (returns None)"}
+    return {
+        "name": "none",
+        "class": NoneSentiment,
+        "description": "Disable sentiment (returns None)",
+    }

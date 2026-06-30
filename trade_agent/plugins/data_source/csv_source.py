@@ -1,4 +1,5 @@
 """CSV-based data source for backtesting."""
+
 from __future__ import annotations
 
 import csv
@@ -25,23 +26,36 @@ class CSVSource(DataSourceInterface):
         with self._path.open("r") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                self._candles.append(Candle(
-                    timestamp=float(row.get("timestamp", 0)),
-                    open=float(row.get("open", 0)),
-                    high=float(row.get("high", 0)),
-                    low=float(row.get("low", 0)),
-                    close=float(row.get("close", 0)),
-                    volume=float(row.get("volume", 0)),
-                ))
+                self._candles.append(
+                    Candle(
+                        timestamp=float(row.get("timestamp", 0)),
+                        open=float(row.get("open", 0)),
+                        high=float(row.get("high", 0)),
+                        low=float(row.get("low", 0)),
+                        close=float(row.get("close", 0)),
+                        volume=float(row.get("volume", 0)),
+                    )
+                )
 
-    def get_candles(self, symbol: str, timeframe: str, limit: int = 200) -> list[Candle]:
+    def get_candles(
+        self, symbol: str, timeframe: str, limit: int = 200
+    ) -> list[Candle]:
         return self._candles[-limit:]
 
     def get_ticker(self, symbol: str) -> Ticker:
         if self._candles:
             last = self._candles[-1]
-            return Ticker(symbol=symbol, last_price=last.close, bid=last.close, ask=last.close, volume_24h=0, change_pct_24h=0)
-        return Ticker(symbol=symbol, last_price=0, bid=0, ask=0, volume_24h=0, change_pct_24h=0)
+            return Ticker(
+                symbol=symbol,
+                last_price=last.close,
+                bid=last.close,
+                ask=last.close,
+                volume_24h=0,
+                change_pct_24h=0,
+            )
+        return Ticker(
+            symbol=symbol, last_price=0, bid=0, ask=0, volume_24h=0, change_pct_24h=0
+        )
 
     def get_orderbook(self, symbol: str, depth: int = 20) -> OrderBook:
         return OrderBook(symbol=symbol, bids=[], asks=[])
@@ -51,4 +65,8 @@ class CSVSource(DataSourceInterface):
 
 
 def register():
-    return {"name": "csv", "class": CSVSource, "description": "CSV file data source for backtesting"}
+    return {
+        "name": "csv",
+        "class": CSVSource,
+        "description": "CSV file data source for backtesting",
+    }

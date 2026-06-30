@@ -1,4 +1,5 @@
 """Test plugin loader."""
+
 from pathlib import Path
 from trade_agent.plugin_loader import PluginLoader
 
@@ -11,7 +12,8 @@ def test_discover_data_source():
     assert "csv" in available
     # ccxt requires the ccxt package to be installed
     try:
-        import ccxt
+        import ccxt  # noqa: F401  # availability probe
+
         assert "ccxt" in available
     except ImportError:
         pass  # ccxt not installed, skip that assertion

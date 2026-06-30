@@ -1,4 +1,5 @@
 """Plugin discovery, registration, and loading system."""
+
 from __future__ import annotations
 
 import importlib
@@ -95,7 +96,9 @@ class PluginLoader:
         plugins = self._discover(slot)
         if name not in plugins:
             available = ", ".join(sorted(plugins.keys())) or "(none found)"
-            raise ValueError(f"Plugin '{name}' not found for slot '{slot}'. Available: {available}")
+            raise ValueError(
+                f"Plugin '{name}' not found for slot '{slot}'. Available: {available}"
+            )
 
         cls = plugins[name]
         interface = _INTERFACE_MAP.get(slot)
@@ -109,23 +112,33 @@ class PluginLoader:
             instance.init(config)
         return instance
 
-    def load_many(self, slot: str, names: list[str], config: dict[str, Any] | None = None) -> list[Any]:
+    def load_many(
+        self, slot: str, names: list[str], config: dict[str, Any] | None = None
+    ) -> list[Any]:
         """Load multiple plugin instances (for slots like 'notifier' that support multiple)."""
         return [self.load(slot, n, config) for n in names]
 
-    def load_from_config(self, config: dict[str, Any], builtin_dir: Path | None = None) -> dict[str, Any]:
+    def load_from_config(
+        self, config: dict[str, Any], builtin_dir: Path | None = None
+    ) -> dict[str, Any]:
         """Load all plugins based on config['plugins'] section.
 
         Returns dict with keys: data_source, strategy, exchange,
         notifiers (list), sentiment, risk_profile, indicators.
         """
         plugins_cfg = config.get("plugins", {})
-        bd = builtin_dir or self._builtin
 
         result: dict[str, Any] = {}
 
         # Single-instance slots
-        for slot in ("data_source", "strategy", "exchange", "sentiment", "risk_profile", "indicators"):
+        for slot in (
+            "data_source",
+            "strategy",
+            "exchange",
+            "sentiment",
+            "risk_profile",
+            "indicators",
+        ):
             name = plugins_cfg.get(slot)
             if name:
                 slot_config = config.get(slot, {})

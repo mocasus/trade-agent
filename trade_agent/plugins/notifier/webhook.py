@@ -1,7 +1,7 @@
 """Webhook notifier — sends HTTP POST."""
+
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import httpx
@@ -26,29 +26,36 @@ class WebhookNotifier(NotifierInterface):
     def send(self, event: Event) -> bool:
         if "all" not in self._alerts and event.category not in self._alerts:
             return False
-        return self._post({
-            "category": event.category,
-            "title": event.title,
-            "message": event.message,
-            "timestamp": event.timestamp,
-            "data": event.data,
-        })
+        return self._post(
+            {
+                "category": event.category,
+                "title": event.title,
+                "message": event.message,
+                "timestamp": event.timestamp,
+                "data": event.data,
+            }
+        )
 
     def send_report(self, report: Report) -> bool:
-        return self._post({
-            "type": "report",
-            "report_type": report.report_type,
-            "total_pnl": report.total_pnl,
-            "total_pnl_pct": report.total_pnl_pct,
-            "trades_count": report.trades_count,
-            "win_rate": report.win_rate,
-        })
+        return self._post(
+            {
+                "type": "report",
+                "report_type": report.report_type,
+                "total_pnl": report.total_pnl,
+                "total_pnl_pct": report.total_pnl_pct,
+                "trades_count": report.trades_count,
+                "win_rate": report.win_rate,
+            }
+        )
 
     def _post(self, data: dict) -> bool:
         try:
             resp = httpx.request(
-                self._method, self._url,
-                json=data, headers=self._headers, timeout=10,
+                self._method,
+                self._url,
+                json=data,
+                headers=self._headers,
+                timeout=10,
             )
             return resp.status_code < 400
         except Exception:
@@ -59,4 +66,8 @@ class WebhookNotifier(NotifierInterface):
 
 
 def register():
-    return {"name": "webhook", "class": WebhookNotifier, "description": "HTTP webhook notifier"}
+    return {
+        "name": "webhook",
+        "class": WebhookNotifier,
+        "description": "HTTP webhook notifier",
+    }

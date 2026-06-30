@@ -1,4 +1,5 @@
 """Console notifier — prints to stdout."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -33,4 +34,8 @@ class ConsoleNotifier(NotifierInterface):
 
 
 def register():
-    return {"name": "console", "class": ConsoleNotifier, "description": "Console stdout notifier"}
+    return {
+        "name": "console",
+        "class": ConsoleNotifier,
+        "description": "Console stdout notifier",
+    }

@@ -1,4 +1,5 @@
 """SQLite storage for trades, decisions, and portfolio state."""
+
 from __future__ import annotations
 
 import json
@@ -99,7 +100,9 @@ class Storage:
 
     # ── Decisions ──
 
-    def log_decision(self, decision: Decision, executed: bool = False, order_id: str | None = None) -> int:
+    def log_decision(
+        self, decision: Decision, executed: bool = False, order_id: str | None = None
+    ) -> int:
         row = (
             datetime.now().timestamp(),
             decision.symbol,
@@ -117,7 +120,8 @@ class Storage:
         cur = self.conn.execute(
             "INSERT INTO decisions (timestamp,symbol,action,amount_pct,confidence,reasoning,"
             "indicators_used,news_factors,metadata,executed,executed_at,order_id) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", row,
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            row,
         )
         self.conn.commit()
         return cur.lastrowid or 0
@@ -125,17 +129,24 @@ class Storage:
     def get_decisions(self, symbol: str | None = None, limit: int = 50) -> list[dict]:
         if symbol:
             rows = self.conn.execute(
-                "SELECT * FROM decisions WHERE symbol=? ORDER BY timestamp DESC LIMIT ?", (symbol, limit),
+                "SELECT * FROM decisions WHERE symbol=? ORDER BY timestamp DESC LIMIT ?",
+                (symbol, limit),
             ).fetchall()
         else:
             rows = self.conn.execute(
-                "SELECT * FROM decisions ORDER BY timestamp DESC LIMIT ?", (limit,),
+                "SELECT * FROM decisions ORDER BY timestamp DESC LIMIT ?",
+                (limit,),
             ).fetchall()
         return [dict(r) for r in rows]
 
     # ── Trades ──
 
-    def log_trade(self, result: OrderResult, stop_loss: float | None = None, take_profit: float | None = None) -> int:
+    def log_trade(
+        self,
+        result: OrderResult,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
+    ) -> int:
         row = (
             result.timestamp,
             result.symbol,
@@ -152,18 +163,22 @@ class Storage:
         )
         cur = self.conn.execute(
             "INSERT INTO trades (timestamp,symbol,side,type,amount,price,fee,order_id,"
-            "stop_loss,take_profit,pnl,status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", row,
+            "stop_loss,take_profit,pnl,status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            row,
         )
         self.conn.commit()
         return cur.lastrowid or 0
 
     def close_trade(self, order_id: str, pnl: float) -> None:
         self.conn.execute(
-            "UPDATE trades SET pnl=?, status='closed' WHERE order_id=?", (pnl, order_id),
+            "UPDATE trades SET pnl=?, status='closed' WHERE order_id=?",
+            (pnl, order_id),
         )
         self.conn.commit()
 
-    def get_trades(self, symbol: str | None = None, status: str | None = None, limit: int = 50) -> list[dict]:
+    def get_trades(
+        self, symbol: str | None = None, status: str | None = None, limit: int = 50
+    ) -> list[dict]:
         q = "SELECT * FROM trades"
         params: list[Any] = []
         if symbol:
@@ -189,7 +204,8 @@ class Storage:
         )
         self.conn.execute(
             "INSERT INTO portfolio (timestamp,total_usd,available_usd,reserved_usd,assets) "
-            "VALUES (?,?,?,?,?)", row,
+            "VALUES (?,?,?,?,?)",
+            row,
         )
         self.conn.commit()
 
@@ -215,7 +231,8 @@ class Storage:
         )
         cur = self.conn.execute(
             "INSERT INTO positions (timestamp,symbol,side,entry_price,amount,"
-            "current_price,stop_loss,take_profit,status) VALUES (?,?,?,?,?,?,?,?,?)", row,
+            "current_price,stop_loss,take_profit,status) VALUES (?,?,?,?,?,?,?,?,?)",
+            row,
         )
         self.conn.commit()
         return cur.lastrowid or 0
@@ -240,7 +257,8 @@ class Storage:
         today_start = datetime.now().replace(hour=0, minute=0, second=0).timestamp()
         row = self.conn.execute(
             "SELECT COALESCE(SUM(pnl), 0) as total_pnl FROM trades "
-            "WHERE timestamp >= ? AND status='closed'", (today_start,),
+            "WHERE timestamp >= ? AND status='closed'",
+            (today_start,),
         ).fetchone()
         pnl = row["total_pnl"] if row else 0.0
 
@@ -272,10 +290,21 @@ class Storage:
 
     def get_positions(self) -> list[dict]:
         cur = self.conn.cursor()
-        cur.execute("SELECT symbol, side, quantity, entry_price, unrealized_pnl FROM positions")
-        return [dict(zip(["symbol", "side", "quantity", "entry_price", "unrealized_pnl"], row)) for row in cur.fetchall()]
+        cur.execute(
+            "SELECT symbol, side, quantity, entry_price, unrealized_pnl FROM positions"
+        )
+        return [
+            dict(
+                zip(
+                    ["symbol", "side", "quantity", "entry_price", "unrealized_pnl"], row
+                )
+            )
+            for row in cur.fetchall()
+        ]
 
     def get_daily_pnl(self) -> list[dict]:
         cur = self.conn.cursor()
-        cur.execute("SELECT date(timestamp) as day, sum(pnl) as pnl FROM trades GROUP BY day ORDER BY day DESC LIMIT 30")
+        cur.execute(
+            "SELECT date(timestamp) as day, sum(pnl) as pnl FROM trades GROUP BY day ORDER BY day DESC LIMIT 30"
+        )
         return [dict(zip(["day", "pnl"], row)) for row in cur.fetchall()]

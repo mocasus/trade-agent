@@ -1,4 +1,5 @@
 """CCXT-based exchange execution plugin."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -6,7 +7,7 @@ from typing import Any
 import ccxt
 
 from trade_agent.interfaces import ExchangeInterface
-from trade_agent.models import Balance, Order, OrderResult, OrderSide, OrderType, Position
+from trade_agent.models import Balance, Order, OrderResult, OrderSide, Position
 
 
 class CCXTExchange(ExchangeInterface):
@@ -19,11 +20,13 @@ class CCXTExchange(ExchangeInterface):
         if not exchange_cls:
             raise ValueError(f"Exchange {exchange_name} not found in ccxt")
 
-        self.exchange = exchange_cls({
-            "apiKey": config.get("api_key", ""),
-            "secret": config.get("api_secret", ""),
-            "enableRateLimit": config.get("rate_limit", True),
-        })
+        self.exchange = exchange_cls(
+            {
+                "apiKey": config.get("api_key", ""),
+                "secret": config.get("api_secret", ""),
+                "enableRateLimit": config.get("rate_limit", True),
+            }
+        )
         if config.get("testnet", True) and hasattr(self.exchange, "set_sandbox_mode"):
             self.exchange.set_sandbox_mode(True)
 
@@ -37,13 +40,18 @@ class CCXTExchange(ExchangeInterface):
                 params["takeProfit"] = {"triggerPrice": order.take_profit}
 
             result = self.exchange.create_order(
-                symbol=order.symbol, type=order.type.value,
-                side=side, amount=order.amount,
-                price=order.price or None, params=params,
+                symbol=order.symbol,
+                type=order.type.value,
+                side=side,
+                amount=order.amount,
+                price=order.price or None,
+                params=params,
             )
             return OrderResult(
                 order_id=result.get("id", ""),
-                symbol=order.symbol, side=side, type=order.type.value,
+                symbol=order.symbol,
+                side=side,
+                type=order.type.value,
                 amount=result.get("amount", order.amount),
                 price=result.get("price", order.price or 0),
                 fee=result.get("fee", {}).get("cost", 0),
@@ -51,9 +59,14 @@ class CCXTExchange(ExchangeInterface):
             )
         except Exception as e:
             return OrderResult(
-                order_id="", symbol=order.symbol, side=side,
-                type=order.type.value, amount=order.amount,
-                price=order.price or 0, status="error", error=str(e),
+                order_id="",
+                symbol=order.symbol,
+                side=side,
+                type=order.type.value,
+                amount=order.amount,
+                price=order.price or 0,
+                status="error",
+                error=str(e),
             )
 
     def cancel_order(self, order_id: str, symbol: str | None = None) -> bool:
@@ -89,4 +102,8 @@ class CCXTExchange(ExchangeInterface):
 
 
 def register():
-    return {"name": "ccxt", "class": CCXTExchange, "description": "CCXT exchange (100+ exchanges)"}
+    return {
+        "name": "ccxt",
+        "class": CCXTExchange,
+        "description": "CCXT exchange (100+ exchanges)",
+    }

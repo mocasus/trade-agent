@@ -1,7 +1,9 @@
 """Trailing stop-loss risk profile."""
+
 from __future__ import annotations
 from trade_agent.interfaces import RiskProfileInterface
 from trade_agent.models import Action, Decision, MarketContext, Position
+
 
 class TrailingStopProfile(RiskProfileInterface):
     """Trailing stop that moves up with price, never down."""
@@ -11,11 +13,15 @@ class TrailingStopProfile(RiskProfileInterface):
         self.activation_threshold = activation_threshold
         self._highest_price: dict[str, float] = {}
 
-    def calculate_position_size(self, balance: float, price: float, confidence: float) -> float:
+    def calculate_position_size(
+        self, balance: float, price: float, confidence: float
+    ) -> float:
         max_pct = 0.05 * confidence
         return balance * max_pct / price
 
-    def check_risk(self, decision: Decision, context: MarketContext, positions: list[Position]) -> Decision:
+    def check_risk(
+        self, decision: Decision, context: MarketContext, positions: list[Position]
+    ) -> Decision:
         symbol = decision.symbol
         current_price = context.ticker.last_price if context.ticker else 0
         entry_price = positions[0].entry_price if positions else current_price
@@ -46,7 +52,9 @@ class TrailingStopProfile(RiskProfileInterface):
     def calculate_take_profit(self, entry_price: float, stop_loss: float) -> float:
         return entry_price + (entry_price - stop_loss) * 2
 
-    def check_risk_rules(self, positions: list[Position], decision: Decision, daily_pnl_pct: float) -> bool:
+    def check_risk_rules(
+        self, positions: list[Position], decision: Decision, daily_pnl_pct: float
+    ) -> bool:
         if daily_pnl_pct < -5.0:
             return False
         return True

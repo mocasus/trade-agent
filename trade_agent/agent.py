@@ -1,17 +1,26 @@
 """Main agent loop: data → indicators → sentiment → strategy → risk → execute → notify → store."""
+
 from __future__ import annotations
 
 import argparse
 import logging
 import signal
-import sys
 import time
-from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 from .config import Config
-from .models import Action, Balance, Candle, Decision, Event, MarketContext, Order, OrderResult, OrderSide, OrderType, Position, Report
+from .models import (
+    Action,
+    Balance,
+    Decision,
+    Event,
+    MarketContext,
+    Order,
+    OrderResult,
+    OrderSide,
+    OrderType,
+    Position,
+)
 from .plugin_loader import PluginLoader
 from .storage import Storage
 
@@ -58,11 +67,13 @@ class TradeAgent:
         auto_stop = self.config.get("safety.auto_stop_on_error", True)
 
         self._running = True
-        self._notify(Event(
-            category="kill_switch" if self._killed else "trade",
-            title="Agent Started",
-            message=f"Trade Agent started. Paper mode: {self.config.get('trading.paper_mode', True)}. Interval: {interval}min.",
-        ))
+        self._notify(
+            Event(
+                category="kill_switch" if self._killed else "trade",
+                title="Agent Started",
+                message=f"Trade Agent started. Paper mode: {self.config.get('trading.paper_mode', True)}. Interval: {interval}min.",
+            )
+        )
 
         while self._running and not self._killed:
             try:
@@ -71,13 +82,20 @@ class TradeAgent:
             except Exception as e:
                 self._api_failures += 1
                 logger.exception("Cycle failed")
-                self._notify(Event(category="error", title="Cycle Error", message=str(e)))
+                self._notify(
+                    Event(category="error", title="Cycle Error", message=str(e))
+                )
                 if auto_stop and self._api_failures >= max_failures:
-                    logger.error("Max API failures (%d) reached — stopping", max_failures)
-                    self._notify(Event(
-                        category="error", title="Agent Stopped",
-                        message=f"Stopped after {max_failures} consecutive failures.",
-                    ))
+                    logger.error(
+                        "Max API failures (%d) reached — stopping", max_failures
+                    )
+                    self._notify(
+                        Event(
+                            category="error",
+                            title="Agent Stopped",
+                            message=f"Stopped after {max_failures} consecutive failures.",
+                        )
+                    )
                     break
 
             if self._running and not self._killed:
@@ -106,7 +124,9 @@ class TradeAgent:
         positions = self._get_positions()
         daily_pnl = self.storage.get_daily_pnl_pct()
 
-        logger.info("Cycle start — %d symbols, daily P&L: %.2f%%", len(symbols), daily_pnl)
+        logger.info(
+            "Cycle start — %d symbols, daily P&L: %.2f%%", len(symbols), daily_pnl
+        )
 
         for sym_cfg in symbols:
             if not sym_cfg.get("enabled", True):
@@ -118,17 +138,24 @@ class TradeAgent:
                 self._process_symbol(symbol, timeframe, balance, positions, daily_pnl)
             except Exception as e:
                 logger.exception("Error processing %s", symbol)
-                self._notify(Event(
-                    category="error", title=f"Error: {symbol}",
-                    message=str(e),
-                ))
+                self._notify(
+                    Event(
+                        category="error",
+                        title=f"Error: {symbol}",
+                        message=str(e),
+                    )
+                )
 
         # Save portfolio state
         self.storage.save_portfolio(balance)
 
     def _process_symbol(
-        self, symbol: str, timeframe: str,
-        balance: Balance, positions: list[Position], daily_pnl: float,
+        self,
+        symbol: str,
+        timeframe: str,
+        balance: Balance,
+        positions: list[Position],
+        daily_pnl: float,
     ) -> None:
         """Process a single symbol: gather data → analyze → decide → execute."""
         logger.info("Processing %s (%s)", symbol, timeframe)
@@ -138,8 +165,12 @@ class TradeAgent:
         ticker = self.data_source.get_ticker(symbol)
 
         # 2. Compute indicators
-        indicator_set = self.config.get("strategy.prompt.indicator_set", ["rsi", "macd", "ema_20", "ema_50", "bb"])
-        indicators = self.indicators.compute(candles, indicator_set) if self.indicators else None
+        indicator_set = self.config.get(
+            "strategy.prompt.indicator_set", ["rsi", "macd", "ema_20", "ema_50", "bb"]
+        )
+        indicators = (
+            self.indicators.compute(candles, indicator_set) if self.indicators else None
+        )
 
         # 3. Get sentiment (optional)
         sentiment = None
@@ -151,16 +182,29 @@ class TradeAgent:
 
         # 4. Build market context
         context = MarketContext(
-            symbol=symbol, timeframe=timeframe, candles=candles,
-            ticker=ticker, indicators=indicators or type(indicators)() if indicators else type("I", (), {"to_dict": lambda: {}})(),
-            sentiment=sentiment, balance=balance, positions=positions,
-            daily_pnl_pct=daily_pnl, config=self.config.data,
+            symbol=symbol,
+            timeframe=timeframe,
+            candles=candles,
+            ticker=ticker,
+            indicators=indicators or type(indicators)()
+            if indicators
+            else type("I", (), {"to_dict": lambda: {}})(),
+            sentiment=sentiment,
+            balance=balance,
+            positions=positions,
+            daily_pnl_pct=daily_pnl,
+            config=self.config.data,
         )
 
         # 5. Strategy decision
         decision = self.strategy.analyze(context)
-        logger.info("Decision: %s %s confidence=%d reasoning=%s",
-                     decision.action.value, decision.symbol, decision.confidence, decision.reasoning[:100])
+        logger.info(
+            "Decision: %s %s confidence=%d reasoning=%s",
+            decision.action.value,
+            decision.symbol,
+            decision.confidence,
+            decision.reasoning[:100],
+        )
 
         # 6. Risk check
         if not self.risk.check_risk_rules(positions, decision, daily_pnl):
@@ -174,16 +218,25 @@ class TradeAgent:
             return
 
         order_result = self._execute_decision(decision, balance, context)
-        self.storage.log_decision(decision, executed=order_result.status != "error", order_id=order_result.order_id)
+        self.storage.log_decision(
+            decision,
+            executed=order_result.status != "error",
+            order_id=order_result.order_id,
+        )
 
         if order_result.status != "error":
-            self._notify(Event(
-                category="trade", title=f"{decision.action.value} {symbol}",
-                message=f"Price: ${order_result.price:.2f}\nAmount: {order_result.amount:.6f}\nConfidence: {decision.confidence}%\nReason: {decision.reasoning}",
-                data={"order": order_result.order_id},
-            ))
+            self._notify(
+                Event(
+                    category="trade",
+                    title=f"{decision.action.value} {symbol}",
+                    message=f"Price: ${order_result.price:.2f}\nAmount: {order_result.amount:.6f}\nConfidence: {decision.confidence}%\nReason: {decision.reasoning}",
+                    data={"order": order_result.order_id},
+                )
+            )
 
-    def _execute_decision(self, decision: Decision, balance: Balance, context: MarketContext) -> OrderResult:
+    def _execute_decision(
+        self, decision: Decision, balance: Balance, context: MarketContext
+    ) -> OrderResult:
         """Execute a trade decision via the exchange plugin."""
         if decision.action == Action.CLOSE_ALL:
             # Close all positions for this symbol
@@ -192,7 +245,9 @@ class TradeAgent:
                 if pos.symbol == decision.symbol:
                     side = OrderSide.SELL if pos.side == "long" else OrderSide.BUY
                     order = Order(
-                        symbol=decision.symbol, side=side, type=OrderType.MARKET,
+                        symbol=decision.symbol,
+                        side=side,
+                        type=OrderType.MARKET,
                         amount=pos.amount,
                     )
                     result = self.exchange.place_order(order)
@@ -202,29 +257,49 @@ class TradeAgent:
                     results.append(result)
             if results:
                 return results[0]
-            return OrderResult(order_id="", symbol=decision.symbol, side="none", type="none",
-                               amount=0, price=0, status="error", error="No positions to close")
+            return OrderResult(
+                order_id="",
+                symbol=decision.symbol,
+                side="none",
+                type="none",
+                amount=0,
+                price=0,
+                status="error",
+                error="No positions to close",
+            )
 
         # BUY or SELL
         side = OrderSide.BUY if decision.action == Action.BUY else OrderSide.SELL
         position_size = self.risk.calculate_position_size(
-            balance.available_usd, decision.confidence,
+            balance.available_usd,
+            decision.confidence,
         )
         price = context.ticker.last_price
         amount = position_size / price if price > 0 else 0
 
         if amount <= 0:
-            return OrderResult(order_id="", symbol=decision.symbol, side=side.value,
-                               type="market", amount=0, price=price, status="error",
-                               error="Insufficient capital")
+            return OrderResult(
+                order_id="",
+                symbol=decision.symbol,
+                side=side.value,
+                type="market",
+                amount=0,
+                price=price,
+                status="error",
+                error="Insufficient capital",
+            )
 
         # Calculate stop-loss and take-profit
         stop_loss = self.risk.calculate_stop_loss(price, context)
         take_profit = self.risk.calculate_take_profit(price, stop_loss)
 
         order = Order(
-            symbol=decision.symbol, side=side, type=OrderType.MARKET,
-            amount=amount, stop_loss=stop_loss, take_profit=take_profit,
+            symbol=decision.symbol,
+            side=side,
+            type=OrderType.MARKET,
+            amount=amount,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
         )
 
         result = self.exchange.place_order(order)
@@ -234,8 +309,11 @@ class TradeAgent:
             position = Position(
                 symbol=decision.symbol,
                 side="long" if side == OrderSide.BUY else "short",
-                entry_price=result.price, amount=result.amount,
-                current_price=result.price, stop_loss=stop_loss, take_profit=take_profit,
+                entry_price=result.price,
+                amount=result.amount,
+                current_price=result.price,
+                stop_loss=stop_loss,
+                take_profit=take_profit,
             )
             self.storage.open_position(position)
 
@@ -266,10 +344,13 @@ class TradeAgent:
     def _shutdown(self) -> None:
         """Cleanup on shutdown."""
         logger.info("Shutting down...")
-        self._notify(Event(
-            category="kill_switch", title="Agent Stopped",
-            message="Trade Agent has been stopped.",
-        ))
+        self._notify(
+            Event(
+                category="kill_switch",
+                title="Agent Stopped",
+                message="Trade Agent has been stopped.",
+            )
+        )
         for notifier in self.notifiers:
             try:
                 notifier.shutdown()
@@ -288,8 +369,14 @@ class TradeAgent:
 def main():
     """CLI entry point."""
     parser = argparse.ArgumentParser(description="Trade Agent — AI-powered trading bot")
-    parser.add_argument("--config", "-c", default="config.yaml", help="Path to config.yaml")
-    parser.add_argument("--log-level", default=None, help="Override log level (DEBUG/INFO/WARNING/ERROR)")
+    parser.add_argument(
+        "--config", "-c", default="config.yaml", help="Path to config.yaml"
+    )
+    parser.add_argument(
+        "--log-level",
+        default=None,
+        help="Override log level (DEBUG/INFO/WARNING/ERROR)",
+    )
     args = parser.parse_args()
 
     config_path = Path(args.config)

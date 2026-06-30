@@ -1,4 +1,5 @@
 """Minimal read-only HTTP dashboard."""
+
 from __future__ import annotations
 import json
 import os
@@ -6,6 +7,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from trade_agent.storage import Storage
 
 DASHBOARD_DIR = os.path.join(os.path.dirname(__file__), "templates")
+
 
 class DashboardHandler(BaseHTTPRequestHandler):
     storage: Storage | None = None
@@ -48,8 +50,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
         total_pnl = sum(t.get("pnl", 0) for t in trades)
         wins = [t for t in trades if t.get("pnl", 0) > 0]
         win_rate = len(wins) / len(trades) * 100 if trades else 0
-        return {"total_trades": len(trades), "total_pnl": total_pnl,
-                "win_rate": win_rate, "status": "running"}
+        return {
+            "total_trades": len(trades),
+            "total_pnl": total_pnl,
+            "win_rate": win_rate,
+            "status": "running",
+        }
 
     def _trades(self) -> dict:
         if not self.storage:

@@ -2,6 +2,7 @@
 
 All data structures used across interfaces, plugins, and the main loop.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -68,6 +69,7 @@ class OrderBook:
 @dataclass
 class Indicators:
     """Technical indicator values for a symbol."""
+
     rsi: float | None = None
     macd: float | None = None
     macd_signal: float | None = None
@@ -180,6 +182,7 @@ class OrderResult:
 @dataclass
 class MarketContext:
     """Full context passed to strategy.analyze()."""
+
     symbol: str
     timeframe: str
     candles: list[Candle]
@@ -196,6 +199,7 @@ class MarketContext:
 @dataclass
 class Event:
     """Notification event passed to notifier.send()."""
+
     category: str  # "trade", "stop_loss", "daily_report", "error", "kill_switch"
     title: str
     message: str
@@ -206,6 +210,7 @@ class Event:
 @dataclass
 class Report:
     """Summary report passed to notifier.send_report()."""
+
     report_type: str  # "daily", "weekly", "monthly"
     total_pnl: float
     total_pnl_pct: float
@@ -220,9 +225,17 @@ class Report:
 
 class OCOOrder:
     """One-Cancels-Other order: stop + limit linked."""
-    def __init__(self, symbol: str, side: str, quantity: float,
-                 stop_price: float, limit_price: float,
-                 order_id: str = "", linked_order_id: str = ""):
+
+    def __init__(
+        self,
+        symbol: str,
+        side: str,
+        quantity: float,
+        stop_price: float,
+        limit_price: float,
+        order_id: str = "",
+        linked_order_id: str = "",
+    ):
         self.symbol = symbol
         self.side = side
         self.quantity = quantity
@@ -231,10 +244,17 @@ class OCOOrder:
         self.order_id = order_id
         self.linked_order_id = linked_order_id
 
+
 class PartialExit:
     """Partial position exit with remaining quantity tracking."""
-    def __init__(self, position_id: str, exit_percentage: float,
-                 exit_price: float, remaining_quantity: float):
+
+    def __init__(
+        self,
+        position_id: str,
+        exit_percentage: float,
+        exit_price: float,
+        remaining_quantity: float,
+    ):
         self.position_id = position_id
         self.exit_percentage = exit_percentage
         self.exit_price = exit_price

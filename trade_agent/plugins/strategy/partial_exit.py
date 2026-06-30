@@ -1,7 +1,9 @@
 """Partial exit strategy — scale out in increments."""
+
 from __future__ import annotations
 from trade_agent.interfaces import StrategyInterface
 from trade_agent.models import Action, Candle, Decision, MarketContext, SentimentScore
+
 
 class PartialExitStrategy(StrategyInterface):
     """Exit positions in stages: 25% at +5%, 25% at +10%, rest rides."""
@@ -14,8 +16,12 @@ class PartialExitStrategy(StrategyInterface):
         ]
         self._triggered: dict[str, set[int]] = {}
 
-    def analyze(self, candles: list[Candle], context: MarketContext,
-                sentiment: SentimentScore | None = None) -> Decision:
+    def analyze(
+        self,
+        candles: list[Candle],
+        context: MarketContext,
+        sentiment: SentimentScore | None = None,
+    ) -> Decision:
         if not context.ticker or not context.positions:
             return Decision(action=Action.HOLD, symbol="", confidence=0)
 
@@ -37,5 +43,9 @@ class PartialExitStrategy(StrategyInterface):
                     confidence=80,
                     reasoning=f"Partial exit: {level['exit_pct']}% at +{level['pct_gain']}% gain (current +{gain_pct:.1f}%)",
                 )
-        return Decision(action=Action.HOLD, symbol=symbol, confidence=30,
-                        reasoning=f"Gain {gain_pct:.1f}% — no exit level triggered")
+        return Decision(
+            action=Action.HOLD,
+            symbol=symbol,
+            confidence=30,
+            reasoning=f"Gain {gain_pct:.1f}% — no exit level triggered",
+        )

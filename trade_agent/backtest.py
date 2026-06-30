@@ -1,4 +1,5 @@
 """Backtesting engine — run any strategy on historical data."""
+
 from __future__ import annotations
 
 import json
@@ -8,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import Config
-from .models import Action, Balance, Candle, Decision, MarketContext, Order, OrderSide, OrderType, Position, Ticker
+from .models import Action, Balance, MarketContext, Position, Ticker
 from .plugin_loader import PluginLoader
 
 _BUILTIN_PLUGINS = Path(__file__).parent / "plugins"
@@ -59,11 +60,13 @@ def run_backtest(config: Config) -> dict[str, Any]:
             logger.warning("No candles for %s", symbol)
             continue
 
-        indicator_set = config.get("strategy.prompt.indicator_set", ["rsi", "macd", "ema_20", "ema_50", "bb"])
+        indicator_set = config.get(
+            "strategy.prompt.indicator_set", ["rsi", "macd", "ema_20", "ema_50", "bb"]
+        )
         batch_size = 200
 
         for i in range(batch_size, len(candles)):
-            batch = candles[i - batch_size:i]
+            batch = candles[i - batch_size : i]
             last = batch[-1]
 
             # Compute indicators
@@ -71,17 +74,25 @@ def run_backtest(config: Config) -> dict[str, Any]:
 
             # Build context
             ticker = Ticker(
-                symbol=symbol, last_price=last.close,
-                bid=last.close, ask=last.close,
+                symbol=symbol,
+                last_price=last.close,
+                bid=last.close,
+                ask=last.close,
                 volume_24h=sum(c.volume for c in batch[-24:] if len(batch) >= 24),
                 change_pct_24h=0,
             )
 
             balance = Balance(total_usd=capital, available_usd=capital)
             context = MarketContext(
-                symbol=symbol, timeframe=timeframe, candles=batch,
-                ticker=ticker, indicators=ind, balance=balance,
-                positions=positions, daily_pnl_pct=0, config=config.data,
+                symbol=symbol,
+                timeframe=timeframe,
+                candles=batch,
+                ticker=ticker,
+                indicators=ind,
+                balance=balance,
+                positions=positions,
+                daily_pnl_pct=0,
+                config=config.data,
             )
 
             # Get decision
@@ -97,16 +108,25 @@ def run_backtest(config: Config) -> dict[str, Any]:
                     fee = cost * 0.001
                     if cost + fee <= capital:
                         capital -= cost + fee
-                        positions.append(Position(
-                            symbol=symbol, side="long",
-                            entry_price=price, amount=amount,
-                            current_price=price,
-                        ))
-                        trades.append({
-                            "timestamp": last.timestamp, "action": "BUY",
-                            "price": price, "amount": amount,
-                            "fee": fee, "confidence": decision.confidence,
-                        })
+                        positions.append(
+                            Position(
+                                symbol=symbol,
+                                side="long",
+                                entry_price=price,
+                                amount=amount,
+                                current_price=price,
+                            )
+                        )
+                        trades.append(
+                            {
+                                "timestamp": last.timestamp,
+                                "action": "BUY",
+                                "price": price,
+                                "amount": amount,
+                                "fee": fee,
+                                "confidence": decision.confidence,
+                            }
+                        )
                 elif decision.action == Action.SELL:
                     for j, pos in enumerate(positions):
                         if pos.symbol == symbol:
@@ -115,27 +135,47 @@ def run_backtest(config: Config) -> dict[str, Any]:
                             pnl = (price - pos.entry_price) * pos.amount - fee
                             capital += proceeds - fee
                             positions.pop(j)
-                            trades.append({
-                                "timestamp": last.timestamp, "action": "SELL",
-                                "price": price, "amount": pos.amount,
-                                "pnl": pnl, "fee": fee,
-                            })
+                            trades.append(
+                                {
+                                    "timestamp": last.timestamp,
+                                    "action": "SELL",
+                                    "price": price,
+                                    "amount": pos.amount,
+                                    "pnl": pnl,
+                                    "fee": fee,
+                                }
+                            )
                             break
 
-            equity_curve.append(capital + sum(p.amount * p.current_price for p in positions))
+            equity_curve.append(
+                capital + sum(p.amount * p.current_price for p in positions)
+            )
 
     # Calculate metrics
     metrics = _calculate_metrics(trades, equity_curve, initial_capital)
 
     # Output
-    output_path = Path(bt_cfg.get("output_path", "~/.trade-agent/backtest-results/")).expanduser()
+    output_path = Path(
+        bt_cfg.get("output_path", "~/.trade-agent/backtest-results/")
+    ).expanduser()
     output_path.mkdir(parents=True, exist_ok=True)
 
-    result_file = output_path / f"backtest_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    result_file = (
+        output_path / f"backtest_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    )
     with result_file.open("w") as f:
-        json.dump({"metrics": metrics, "trades": trades, "config": bt_cfg}, f, indent=2, default=str)
+        json.dump(
+            {"metrics": metrics, "trades": trades, "config": bt_cfg},
+            f,
+            indent=2,
+            default=str,
+        )
 
-    logger.info("Backtest complete — %d trades, %.1f%% return", len(trades), metrics["total_return_pct"])
+    logger.info(
+        "Backtest complete — %d trades, %.1f%% return",
+        len(trades),
+        metrics["total_return_pct"],
+    )
 
     # Cleanup
     data_source.shutdown()
@@ -144,7 +184,9 @@ def run_backtest(config: Config) -> dict[str, Any]:
     return metrics
 
 
-def _calculate_metrics(trades: list[dict], equity_curve: list[float], initial_capital: float) -> dict[str, Any]:
+def _calculate_metrics(
+    trades: list[dict], equity_curve: list[float], initial_capital: float
+) -> dict[str, Any]:
     final_equity = equity_curve[-1] if equity_curve else initial_capital
     total_return = final_equity - initial_capital
     total_return_pct = total_return / initial_capital * 100
@@ -170,7 +212,10 @@ def _calculate_metrics(trades: list[dict], equity_curve: list[float], initial_ca
 
     # Sharpe ratio (simplified)
     if len(equity_curve) > 1:
-        returns = [(equity_curve[i] - equity_curve[i-1]) / equity_curve[i-1] for i in range(1, len(equity_curve))]
+        returns = [
+            (equity_curve[i] - equity_curve[i - 1]) / equity_curve[i - 1]
+            for i in range(1, len(equity_curve))
+        ]
         avg_return = sum(returns) / len(returns)
         std_return = (sum((r - avg_return) ** 2 for r in returns) / len(returns)) ** 0.5
         sharpe = avg_return / std_return if std_return > 0 else 0

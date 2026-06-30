@@ -1,6 +1,7 @@
 """Moderate risk profile plugin."""
+
 from trade_agent.interfaces import RiskProfileInterface
-from trade_agent.models import Decision, MarketContext, Position
+from trade_agent.models import MarketContext
 
 
 class ModerateProfile(RiskProfileInterface):
@@ -27,9 +28,13 @@ class ModerateProfile(RiskProfileInterface):
         dl = config.get("daily_limits", {})
         self.max_loss_pct = dl.get("max_loss_pct", self.max_loss_pct)
         self.max_positions = dl.get("max_open_positions", self.max_positions)
-        self.reserve_pct = config.get("portfolio", {}).get("reserve_pct", self.reserve_pct)
+        self.reserve_pct = config.get("portfolio", {}).get(
+            "reserve_pct", self.reserve_pct
+        )
 
-    def calculate_position_size(self, available_capital: float, confidence: int) -> float:
+    def calculate_position_size(
+        self, available_capital: float, confidence: int
+    ) -> float:
         tradable = available_capital * (1 - self.reserve_pct / 100)
         pct = self.min_pct + (self.max_pct - self.min_pct) * min(confidence / 100, 1)
         return tradable * min(pct, self.max_pct) / 100
@@ -56,4 +61,8 @@ class ModerateProfile(RiskProfileInterface):
 
 
 def register():
-    return {"name": "moderate", "class": ModerateProfile, "description": "Moderate risk profile"}
+    return {
+        "name": "moderate",
+        "class": ModerateProfile,
+        "description": "Moderate risk profile",
+    }

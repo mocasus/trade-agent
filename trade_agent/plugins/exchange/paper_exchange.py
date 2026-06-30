@@ -1,11 +1,12 @@
 """Paper trading exchange simulator."""
+
 from __future__ import annotations
 
 from datetime import datetime
 from typing import Any
 
 from trade_agent.interfaces import ExchangeInterface
-from trade_agent.models import Balance, Order, OrderResult, OrderSide, OrderType, Position
+from trade_agent.models import Balance, Order, OrderResult, OrderSide, Position
 
 
 class PaperExchange(ExchangeInterface):
@@ -31,49 +32,75 @@ class PaperExchange(ExchangeInterface):
         # Get current price (from order.price or mock)
         base_price = order.price or 50000.0  # fallback mock price
         slippage = base_price * (self._slippage_pct / 100)
-        exec_price = base_price + slippage if order.side == OrderSide.BUY else base_price - slippage
+        exec_price = (
+            base_price + slippage
+            if order.side == OrderSide.BUY
+            else base_price - slippage
+        )
         fee = order.amount * exec_price * (self._fee_pct / 100)
 
         if order.side == OrderSide.BUY:
             cost = order.amount * exec_price + fee
             if cost > self._balance.available_usd:
                 return OrderResult(
-                    order_id=order_id, symbol=order.symbol, side="buy",
-                    type=order.type.value, amount=0, price=exec_price,
-                    status="error", error="Insufficient paper balance", fee=0, timestamp=now,
+                    order_id=order_id,
+                    symbol=order.symbol,
+                    side="buy",
+                    type=order.type.value,
+                    amount=0,
+                    price=exec_price,
+                    status="error",
+                    error="Insufficient paper balance",
+                    fee=0,
+                    timestamp=now,
                 )
             self._balance.available_usd -= cost
-            self._positions.append(Position(
-                symbol=order.symbol, side="long",
-                entry_price=exec_price, amount=order.amount,
-                current_price=exec_price,
-                stop_loss=order.stop_loss, take_profit=order.take_profit,
-                opened_at=now,
-            ))
+            self._positions.append(
+                Position(
+                    symbol=order.symbol,
+                    side="long",
+                    entry_price=exec_price,
+                    amount=order.amount,
+                    current_price=exec_price,
+                    stop_loss=order.stop_loss,
+                    take_profit=order.take_profit,
+                    opened_at=now,
+                )
+            )
         elif order.side == OrderSide.SELL:
             # Find and close matching position
             closed = False
-            pnl = 0.0
             for i, pos in enumerate(self._positions):
                 if pos.symbol == order.symbol and pos.side == "long":
                     proceeds = order.amount * exec_price - fee
-                    pnl = (exec_price - pos.entry_price) * order.amount
                     self._balance.available_usd += proceeds
                     self._positions.pop(i)
                     closed = True
                     break
             if not closed:
                 return OrderResult(
-                    order_id=order_id, symbol=order.symbol, side="sell",
-                    type=order.type.value, amount=0, price=exec_price,
-                    status="error", error="No position to close", fee=0, timestamp=now,
+                    order_id=order_id,
+                    symbol=order.symbol,
+                    side="sell",
+                    type=order.type.value,
+                    amount=0,
+                    price=exec_price,
+                    status="error",
+                    error="No position to close",
+                    fee=0,
+                    timestamp=now,
                 )
 
         return OrderResult(
-            order_id=order_id, symbol=order.symbol,
+            order_id=order_id,
+            symbol=order.symbol,
             side="buy" if order.side == OrderSide.BUY else "sell",
-            type=order.type.value, amount=order.amount, price=exec_price,
-            fee=fee, status="filled", timestamp=now,
+            type=order.type.value,
+            amount=order.amount,
+            price=exec_price,
+            fee=fee,
+            status="filled",
+            timestamp=now,
         )
 
     def cancel_order(self, order_id: str, symbol: str | None = None) -> bool:
@@ -100,4 +127,8 @@ class PaperExchange(ExchangeInterface):
 
 
 def register():
-    return {"name": "paper", "class": PaperExchange, "description": "Paper trading simulator (no real funds)"}
+    return {
+        "name": "paper",
+        "class": PaperExchange,
+        "description": "Paper trading simulator (no real funds)",
+    }

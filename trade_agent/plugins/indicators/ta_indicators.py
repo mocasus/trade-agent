@@ -1,4 +1,5 @@
 """Technical indicators plugin using pandas-ta."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -30,10 +31,17 @@ class TAIndicators(IndicatorPluginInterface):
 
         try:
             import pandas as pd
-            df = pd.DataFrame({"close": closes, "high": highs, "low": lows, "volume": volumes})
+
+            df = pd.DataFrame(
+                {"close": closes, "high": highs, "low": lows, "volume": volumes}
+            )
 
             if "rsi" in wanted:
-                result.rsi = float(df.ta.rsi(length=14).iloc[-1]) if hasattr(df, "ta") else self._rsi(closes)
+                result.rsi = (
+                    float(df.ta.rsi(length=14).iloc[-1])
+                    if hasattr(df, "ta")
+                    else self._rsi(closes)
+                )
 
             if "macd" in wanted:
                 macd_data = self._macd(closes)
@@ -100,19 +108,30 @@ class TAIndicators(IndicatorPluginInterface):
             ema = (float(val) - ema) * multiplier + ema
         return ema
 
-    def _macd(self, closes: np.ndarray, fast: int = 12, slow: int = 26, signal: int = 9) -> tuple:
+    def _macd(
+        self, closes: np.ndarray, fast: int = 12, slow: int = 26, signal: int = 9
+    ) -> tuple:
         if len(closes) < slow + signal:
             return (0.0, 0.0, 0.0)
         ema_fast = self._ema(closes, fast)
         ema_slow = self._ema(closes, slow)
         macd_line = ema_fast - ema_slow
         # Simplified signal line
-        macd_values = [self._ema(closes[:i+1], fast) - self._ema(closes[:i+1], slow) for i in range(slow, len(closes))]
-        signal_line = self._ema(np.array(macd_values), signal) if len(macd_values) >= signal else macd_values[-1]
+        macd_values = [
+            self._ema(closes[: i + 1], fast) - self._ema(closes[: i + 1], slow)
+            for i in range(slow, len(closes))
+        ]
+        signal_line = (
+            self._ema(np.array(macd_values), signal)
+            if len(macd_values) >= signal
+            else macd_values[-1]
+        )
         histogram = macd_line - float(signal_line)
         return (float(macd_line), float(signal_line), float(histogram))
 
-    def _bollinger(self, closes: np.ndarray, period: int = 20, std_dev: float = 2.0) -> tuple:
+    def _bollinger(
+        self, closes: np.ndarray, period: int = 20, std_dev: float = 2.0
+    ) -> tuple:
         if len(closes) < period:
             last = float(closes[-1]) if len(closes) > 0 else 0
             return (last, last, last)
@@ -120,7 +139,9 @@ class TAIndicators(IndicatorPluginInterface):
         std = np.std(closes[-period:])
         return (float(sma + std_dev * std), float(sma), float(sma - std_dev * std))
 
-    def _atr(self, highs: np.ndarray, lows: np.ndarray, closes: np.ndarray, period: int = 14) -> float:
+    def _atr(
+        self, highs: np.ndarray, lows: np.ndarray, closes: np.ndarray, period: int = 14
+    ) -> float:
         if len(closes) < period + 1:
             return 0.0
         tr_values = []
@@ -135,4 +156,8 @@ class TAIndicators(IndicatorPluginInterface):
 
 
 def register():
-    return {"name": "ta", "class": TAIndicators, "description": "Technical indicators (RSI, MACD, EMA, BB, ATR)"}
+    return {
+        "name": "ta",
+        "class": TAIndicators,
+        "description": "Technical indicators (RSI, MACD, EMA, BB, ATR)",
+    }

@@ -1,4 +1,5 @@
 """Test config loading and env var resolution."""
+
 import os
 import tempfile
 from trade_agent.config import Config, resolve_env_vars, deep_merge

@@ -1,4 +1,5 @@
 """YAML config loader with env var resolution and validation."""
+
 from __future__ import annotations
 
 import os
@@ -63,6 +64,7 @@ _DEFAULTS = {
 def resolve_env_vars(value: Any) -> Any:
     """Resolve ${VAR} references in string values from environment variables."""
     if isinstance(value, str):
+
         def _replace(m) -> str:
             var = m.group(1)
             # Support default syntax: ${VAR:-default}
@@ -71,6 +73,7 @@ def resolve_env_vars(value: Any) -> Any:
                 return os.environ.get(var_name, default) or ""
             env_val = os.environ.get(var, "")
             return env_val if env_val else ""
+
         return _ENV_RE.sub(_replace, value)
     elif isinstance(value, dict):
         return {k: resolve_env_vars(v) for k, v in value.items()}
@@ -121,13 +124,19 @@ class Config:
         # Expand path fields
         if "agent" in self._data:
             if "data_dir" in self._data["agent"]:
-                self._data["agent"]["data_dir"] = str(expand_path(self._data["agent"]["data_dir"]))
+                self._data["agent"]["data_dir"] = str(
+                    expand_path(self._data["agent"]["data_dir"])
+                )
             if "log_file" in self._data["agent"]:
-                self._data["agent"]["log_file"] = str(expand_path(self._data["agent"]["log_file"]))
+                self._data["agent"]["log_file"] = str(
+                    expand_path(self._data["agent"]["log_file"])
+                )
         if "storage" in self._data:
             for key in ("db_path", "backup_dir"):
                 if key in self._data["storage"]:
-                    self._data["storage"][key] = str(expand_path(self._data["storage"][key]))
+                    self._data["storage"][key] = str(
+                        expand_path(self._data["storage"][key])
+                    )
 
     def get(self, key: str, default: Any = None) -> Any:
         """Get a config value by dotted key (e.g., 'trading.paper_mode')."""
@@ -176,6 +185,8 @@ class Config:
         if not trading.get("paper_mode", True):
             ds = data.get("data_source", {})
             if not ds.get("api_key") or not ds.get("api_secret"):
-                issues.append("Paper mode is OFF but no exchange API keys configured — dangerous!")
+                issues.append(
+                    "Paper mode is OFF but no exchange API keys configured — dangerous!"
+                )
 
         return issues

@@ -1,4 +1,5 @@
 """CCXT-based data source plugin."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -27,22 +28,32 @@ class CCXTSource(DataSourceInterface):
         if not exchange_cls:
             raise ValueError(f"Exchange {self._exchange_name} not found in ccxt")
 
-        self.exchange = exchange_cls({
-            "apiKey": api_key,
-            "secret": api_secret,
-            "enableRateLimit": config.get("rate_limit", True),
-        })
+        self.exchange = exchange_cls(
+            {
+                "apiKey": api_key,
+                "secret": api_secret,
+                "enableRateLimit": config.get("rate_limit", True),
+            }
+        )
 
         if self._testnet and hasattr(self.exchange, "set_sandbox_mode"):
             self.exchange.set_sandbox_mode(True)
 
-    def get_candles(self, symbol: str, timeframe: str, limit: int = 200) -> list[Candle]:
+    def get_candles(
+        self, symbol: str, timeframe: str, limit: int = 200
+    ) -> list[Candle]:
         ohlcv = self.exchange.fetch_ohlcv(symbol, timeframe, limit=limit)
-        return [Candle(
-            timestamp=row[0] / 1000,
-            open=row[1], high=row[2], low=row[3],
-            close=row[4], volume=row[5],
-        ) for row in ohlcv]
+        return [
+            Candle(
+                timestamp=row[0] / 1000,
+                open=row[1],
+                high=row[2],
+                low=row[3],
+                close=row[4],
+                volume=row[5],
+            )
+            for row in ohlcv
+        ]
 
     def get_ticker(self, symbol: str) -> Ticker:
         t = self.exchange.fetch_ticker(symbol)
@@ -69,4 +80,8 @@ class CCXTSource(DataSourceInterface):
 
 
 def register():
-    return {"name": "ccxt", "class": CCXTSource, "description": "CCXT data source (100+ exchanges)"}
+    return {
+        "name": "ccxt",
+        "class": CCXTSource,
+        "description": "CCXT data source (100+ exchanges)",
+    }

@@ -1,4 +1,5 @@
 """Built-in risk profile implementations."""
+
 from __future__ import annotations
 
 from .interfaces import RiskProfileInterface
@@ -34,10 +35,16 @@ class ConservativeProfile(RiskProfileInterface):
         self.max_loss_pct = dl.get("max_loss_pct", self.max_loss_pct)
         self.max_trades = dl.get("max_trades", self.max_trades)
         self.max_positions = dl.get("max_open_positions", self.max_positions)
-        self.max_consecutive_losses = dl.get("max_consecutive_losses", self.max_consecutive_losses)
-        self.reserve_pct = config.get("portfolio", {}).get("reserve_pct", self.reserve_pct)
+        self.max_consecutive_losses = dl.get(
+            "max_consecutive_losses", self.max_consecutive_losses
+        )
+        self.reserve_pct = config.get("portfolio", {}).get(
+            "reserve_pct", self.reserve_pct
+        )
 
-    def calculate_position_size(self, available_capital: float, confidence: int) -> float:
+    def calculate_position_size(
+        self, available_capital: float, confidence: int
+    ) -> float:
         tradable = available_capital * (1 - self.reserve_pct / 100)
         pct = self.min_pct + (self.max_pct - self.min_pct) * (confidence / 100)
         pct = min(pct, self.max_pct)
@@ -53,7 +60,9 @@ class ConservativeProfile(RiskProfileInterface):
         risk = entry_price - stop_loss
         return entry_price + risk * self.rr_ratio
 
-    def check_risk_rules(self, positions: list[Position], decision: Decision, daily_pnl_pct: float) -> bool:
+    def check_risk_rules(
+        self, positions: list[Position], decision: Decision, daily_pnl_pct: float
+    ) -> bool:
         if decision.action.value in ("HOLD",):
             return True
         if decision.confidence < self.confidence_floor:
@@ -94,10 +103,16 @@ class ModerateProfile(RiskProfileInterface):
         self.max_loss_pct = dl.get("max_loss_pct", self.max_loss_pct)
         self.max_trades = dl.get("max_trades", self.max_trades)
         self.max_positions = dl.get("max_open_positions", self.max_positions)
-        self.max_consecutive_losses = dl.get("max_consecutive_losses", self.max_consecutive_losses)
-        self.reserve_pct = config.get("portfolio", {}).get("reserve_pct", self.reserve_pct)
+        self.max_consecutive_losses = dl.get(
+            "max_consecutive_losses", self.max_consecutive_losses
+        )
+        self.reserve_pct = config.get("portfolio", {}).get(
+            "reserve_pct", self.reserve_pct
+        )
 
-    def calculate_position_size(self, available_capital: float, confidence: int) -> float:
+    def calculate_position_size(
+        self, available_capital: float, confidence: int
+    ) -> float:
         tradable = available_capital * (1 - self.reserve_pct / 100)
         pct = self.min_pct + (self.max_pct - self.min_pct) * (confidence / 100)
         pct = min(pct, self.max_pct)
@@ -113,7 +128,9 @@ class ModerateProfile(RiskProfileInterface):
         risk = entry_price - stop_loss
         return entry_price + risk * self.rr_ratio
 
-    def check_risk_rules(self, positions: list[Position], decision: Decision, daily_pnl_pct: float) -> bool:
+    def check_risk_rules(
+        self, positions: list[Position], decision: Decision, daily_pnl_pct: float
+    ) -> bool:
         if decision.action.value in ("HOLD",):
             return True
         if decision.confidence < self.confidence_floor:
@@ -154,10 +171,16 @@ class AggressiveProfile(RiskProfileInterface):
         self.max_loss_pct = dl.get("max_loss_pct", self.max_loss_pct)
         self.max_trades = dl.get("max_trades", self.max_trades)
         self.max_positions = dl.get("max_open_positions", self.max_positions)
-        self.max_consecutive_losses = dl.get("max_consecutive_losses", self.max_consecutive_losses)
-        self.reserve_pct = config.get("portfolio", {}).get("reserve_pct", self.reserve_pct)
+        self.max_consecutive_losses = dl.get(
+            "max_consecutive_losses", self.max_consecutive_losses
+        )
+        self.reserve_pct = config.get("portfolio", {}).get(
+            "reserve_pct", self.reserve_pct
+        )
 
-    def calculate_position_size(self, available_capital: float, confidence: int) -> float:
+    def calculate_position_size(
+        self, available_capital: float, confidence: int
+    ) -> float:
         tradable = available_capital * (1 - self.reserve_pct / 100)
         pct = self.min_pct + (self.max_pct - self.min_pct) * (confidence / 100)
         pct = min(pct, self.max_pct)
@@ -173,7 +196,9 @@ class AggressiveProfile(RiskProfileInterface):
         risk = entry_price - stop_loss
         return entry_price + risk * self.rr_ratio
 
-    def check_risk_rules(self, positions: list[Position], decision: Decision, daily_pnl_pct: float) -> bool:
+    def check_risk_rules(
+        self, positions: list[Position], decision: Decision, daily_pnl_pct: float
+    ) -> bool:
         if decision.action.value in ("HOLD",):
             return True
         if decision.confidence < self.confidence_floor:
@@ -187,7 +212,19 @@ class AggressiveProfile(RiskProfileInterface):
 
 def register():
     return {
-        "conservative": {"name": "conservative", "class": ConservativeProfile, "description": "Conservative risk: small positions, tight stops"},
-        "moderate": {"name": "moderate", "class": ModerateProfile, "description": "Moderate risk: standard positions, moderate stops"},
-        "aggressive": {"name": "aggressive", "class": AggressiveProfile, "description": "Aggressive risk: large positions, loose stops"},
+        "conservative": {
+            "name": "conservative",
+            "class": ConservativeProfile,
+            "description": "Conservative risk: small positions, tight stops",
+        },
+        "moderate": {
+            "name": "moderate",
+            "class": ModerateProfile,
+            "description": "Moderate risk: standard positions, moderate stops",
+        },
+        "aggressive": {
+            "name": "aggressive",
+            "class": AggressiveProfile,
+            "description": "Aggressive risk: large positions, loose stops",
+        },
     }

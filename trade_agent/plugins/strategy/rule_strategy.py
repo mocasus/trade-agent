@@ -1,4 +1,5 @@
 """Rule-based strategy plugin."""
+
 from __future__ import annotations
 
 import logging
@@ -36,7 +37,12 @@ class RuleStrategy(StrategyInterface):
             except Exception:
                 logger.debug("Rule condition error: %s", condition)
 
-        return Decision(action=Action.HOLD, symbol=context.symbol, confidence=50, reasoning="No rules matched")
+        return Decision(
+            action=Action.HOLD,
+            symbol=context.symbol,
+            confidence=50,
+            reasoning="No rules matched",
+        )
 
     def _eval_condition(self, condition: str, ind: dict[str, float]) -> bool:
         """Evaluate simple conditions like 'rsi < 30', 'macd > 0'."""
@@ -71,4 +77,8 @@ class RuleStrategy(StrategyInterface):
 
 
 def register():
-    return {"name": "rule", "class": RuleStrategy, "description": "Rule-based strategy (config conditions)"}
+    return {
+        "name": "rule",
+        "class": RuleStrategy,
+        "description": "Rule-based strategy (config conditions)",
+    }

@@ -1,9 +1,11 @@
 """LLM-based strategy plugin."""
+
 from __future__ import annotations
 
 import json
 import logging
 import re
+from pathlib import Path
 from typing import Any
 
 from openai import OpenAI
@@ -87,7 +89,12 @@ class LLMStrategy(StrategyInterface):
             return self._parse_decision(raw, context.symbol)
         except Exception as e:
             logger.error("LLM call failed: %s", e)
-            return Decision(action=Action.HOLD, symbol=context.symbol, confidence=0, reasoning=f"LLM error: {e}")
+            return Decision(
+                action=Action.HOLD,
+                symbol=context.symbol,
+                confidence=0,
+                reasoning=f"LLM error: {e}",
+            )
 
     def _build_prompt(self, ctx: MarketContext) -> str:
         indicators_str = ""
@@ -97,14 +104,23 @@ class LLMStrategy(StrategyInterface):
 
         news_str = ""
         if ctx.sentiment and ctx.sentiment.summary:
-            news_str = f"Sentiment score: {ctx.sentiment.score:.2f}\n{ctx.sentiment.summary}"
+            news_str = (
+                f"Sentiment score: {ctx.sentiment.score:.2f}\n{ctx.sentiment.summary}"
+            )
 
         positions_str = f"{len(ctx.positions)} open"
         if ctx.positions:
-            positions_str += " (" + ", ".join(f"{p.symbol} {p.unrealized_pnl_pct:.1f}%" for p in ctx.positions) + ")"
+            positions_str += (
+                " ("
+                + ", ".join(
+                    f"{p.symbol} {p.unrealized_pnl_pct:.1f}%" for p in ctx.positions
+                )
+                + ")"
+            )
 
         return self._prompt_template.format(
-            symbol=ctx.symbol, timeframe=ctx.timeframe,
+            symbol=ctx.symbol,
+            timeframe=ctx.timeframe,
             price=ctx.ticker.last_price,
             change_24h=ctx.ticker.change_pct_24h,
             volume_24h=ctx.ticker.volume_24h,
@@ -113,16 +129,24 @@ class LLMStrategy(StrategyInterface):
             available=ctx.balance.available_usd if ctx.balance else 0,
             positions=positions_str,
             daily_pnl=ctx.daily_pnl_pct,
-            max_pos_pct=ctx.config.get("risk", {}).get("position_sizing", {}).get("max_pct", 8),
-            sl_method=ctx.config.get("risk", {}).get("stop_loss", {}).get("method", "atr"),
-            daily_loss_pct=ctx.config.get("risk", {}).get("daily_limits", {}).get("max_loss_pct", 5),
+            max_pos_pct=ctx.config.get("risk", {})
+            .get("position_sizing", {})
+            .get("max_pct", 8),
+            sl_method=ctx.config.get("risk", {})
+            .get("stop_loss", {})
+            .get("method", "atr"),
+            daily_loss_pct=ctx.config.get("risk", {})
+            .get("daily_limits", {})
+            .get("max_loss_pct", 5),
         )
 
     def _parse_decision(self, raw: str, symbol: str) -> Decision:
         # Extract JSON from response (may have markdown wrapping)
         json_match = re.search(r"\{[^{}]*\}", raw, re.DOTALL)
         if not json_match:
-            return Decision(action=Action.HOLD, symbol=symbol, confidence=0, reasoning=raw)
+            return Decision(
+                action=Action.HOLD, symbol=symbol, confidence=0, reasoning=raw
+            )
 
         try:
             data = json.loads(json_match.group())
@@ -142,11 +166,17 @@ class LLMStrategy(StrategyInterface):
                 news_factors=data.get("news_factors", []),
             )
         except json.JSONDecodeError:
-            return Decision(action=Action.HOLD, symbol=symbol, confidence=0, reasoning=raw)
+            return Decision(
+                action=Action.HOLD, symbol=symbol, confidence=0, reasoning=raw
+            )
 
     def shutdown(self) -> None:
         pass
 
 
 def register():
-    return {"name": "llm", "class": LLMStrategy, "description": "LLM-based trading strategy"}
+    return {
+        "name": "llm",
+        "class": LLMStrategy,
+        "description": "LLM-based trading strategy",
+    }

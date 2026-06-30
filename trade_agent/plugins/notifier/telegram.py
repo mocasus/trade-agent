@@ -1,4 +1,5 @@
 """Telegram notifier bot with command handling."""
+
 from __future__ import annotations
 import logging
 import threading
@@ -26,7 +27,12 @@ class TelegramNotifier(NotifierInterface):
         self._token = config.get("bot_token", "")
         self._chat_id = str(config.get("chat_id", ""))
         self._base_url = f"https://api.telegram.org/bot{self._token}"
-        self._alerts = [a.lower() for a in config.get("alerts", ["trade", "stop_loss", "error", "kill_switch"])]
+        self._alerts = [
+            a.lower()
+            for a in config.get(
+                "alerts", ["trade", "stop_loss", "error", "kill_switch"]
+            )
+        ]
         self._commands_enabled = config.get("commands", True)
 
     def set_command_handler(self, handler) -> None:
@@ -68,6 +74,7 @@ class TelegramNotifier(NotifierInterface):
 
     def _poll_loop(self) -> None:
         import time
+
         while self._running:
             try:
                 resp = httpx.get(
@@ -111,4 +118,8 @@ class TelegramNotifier(NotifierInterface):
 
 
 def register():
-    return {"name": "telegram", "class": TelegramNotifier, "description": "Telegram bot notifier with commands"}
+    return {
+        "name": "telegram",
+        "class": TelegramNotifier,
+        "description": "Telegram bot notifier with commands",
+    }

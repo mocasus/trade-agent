@@ -3,6 +3,7 @@
 Every major component is behind an interface. The core agent loop only
 knows these interfaces — never concrete implementations.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -29,16 +30,15 @@ class DataSourceInterface(ABC):
     """Fetch market data (candles, orderbook, ticker)."""
 
     @abstractmethod
-    def get_candles(self, symbol: str, timeframe: str, limit: int = 200) -> list[Candle]:
-        ...
+    def get_candles(
+        self, symbol: str, timeframe: str, limit: int = 200
+    ) -> list[Candle]: ...
 
     @abstractmethod
-    def get_ticker(self, symbol: str) -> Ticker:
-        ...
+    def get_ticker(self, symbol: str) -> Ticker: ...
 
     @abstractmethod
-    def get_orderbook(self, symbol: str, depth: int = 20) -> OrderBook:
-        ...
+    def get_orderbook(self, symbol: str, depth: int = 20) -> OrderBook: ...
 
     def init(self, config: dict[str, Any]) -> None:
         """Called once on startup with data_source config section."""
@@ -53,8 +53,7 @@ class StrategyInterface(ABC):
     """Decide what to do based on market context."""
 
     @abstractmethod
-    def analyze(self, context: MarketContext) -> Decision:
-        ...
+    def analyze(self, context: MarketContext) -> Decision: ...
 
     def init(self, config: dict[str, Any]) -> None:
         """Called once on startup with strategy config section."""
@@ -68,20 +67,16 @@ class ExchangeInterface(ABC):
     """Execute trades on an exchange."""
 
     @abstractmethod
-    def place_order(self, order: Order) -> OrderResult:
-        ...
+    def place_order(self, order: Order) -> OrderResult: ...
 
     @abstractmethod
-    def cancel_order(self, order_id: str, symbol: str | None = None) -> bool:
-        ...
+    def cancel_order(self, order_id: str, symbol: str | None = None) -> bool: ...
 
     @abstractmethod
-    def get_balance(self) -> Balance:
-        ...
+    def get_balance(self) -> Balance: ...
 
     @abstractmethod
-    def get_positions(self) -> list[Position]:
-        ...
+    def get_positions(self) -> list[Position]: ...
 
     def init(self, config: dict[str, Any]) -> None:
         pass
@@ -94,12 +89,10 @@ class NotifierInterface(ABC):
     """Send alerts to users."""
 
     @abstractmethod
-    def send(self, event: Event) -> bool:
-        ...
+    def send(self, event: Event) -> bool: ...
 
     @abstractmethod
-    def send_report(self, report: Report) -> bool:
-        ...
+    def send_report(self, report: Report) -> bool: ...
 
     def init(self, config: dict[str, Any]) -> None:
         pass
@@ -124,8 +117,7 @@ class SentimentInterface(ABC):
     """Fetch + score news sentiment."""
 
     @abstractmethod
-    def get_sentiment(self, symbol: str) -> SentimentScore | None:
-        ...
+    def get_sentiment(self, symbol: str) -> SentimentScore | None: ...
 
     def init(self, config: dict[str, Any]) -> None:
         pass
@@ -138,7 +130,9 @@ class RiskProfileInterface(ABC):
     """Calculate position size, stop-loss, take-profit, and check risk rules."""
 
     @abstractmethod
-    def calculate_position_size(self, available_capital: float, confidence: int) -> float:
+    def calculate_position_size(
+        self, available_capital: float, confidence: int
+    ) -> float:
         """Return position size in USD."""
         ...
 
@@ -153,7 +147,9 @@ class RiskProfileInterface(ABC):
         ...
 
     @abstractmethod
-    def check_risk_rules(self, positions: list[Position], decision: Decision, daily_pnl_pct: float) -> bool:
+    def check_risk_rules(
+        self, positions: list[Position], decision: Decision, daily_pnl_pct: float
+    ) -> bool:
         """Return True if the trade is allowed, False if it violates risk rules."""
         ...
 
@@ -168,8 +164,9 @@ class IndicatorPluginInterface(ABC):
     """Compute technical indicators from candle data."""
 
     @abstractmethod
-    def compute(self, candles: list[Candle], indicator_set: list[str]) -> Indicators:
-        ...
+    def compute(
+        self, candles: list[Candle], indicator_set: list[str]
+    ) -> Indicators: ...
 
     def init(self, config: dict[str, Any]) -> None:
         pass

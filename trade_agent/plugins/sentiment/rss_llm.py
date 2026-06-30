@@ -1,7 +1,7 @@
 """RSS + LLM sentiment analysis plugin."""
+
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 import re
@@ -49,7 +49,9 @@ class RSSLLMSentiment(SentimentInterface):
                 base_url=strategy_ai.get("base_url", "https://api.openai.com/v1"),
                 api_key=strategy_ai.get("api_key", ""),
             )
-            self._model = strategy_ai.get("sentiment_model_override", strategy_ai.get("model", "gpt-4o-mini"))
+            self._model = strategy_ai.get(
+                "sentiment_model_override", strategy_ai.get("model", "gpt-4o-mini")
+            )
 
     def get_sentiment(self, symbol: str) -> SentimentScore | None:
         # Check cache
@@ -62,7 +64,9 @@ class RSSLLMSentiment(SentimentInterface):
         # Fetch news
         items = self._fetch_news(symbol)
         if not items:
-            return SentimentScore(symbol=symbol, score=0.0, summary="No recent news", sources=[])
+            return SentimentScore(
+                symbol=symbol, score=0.0, summary="No recent news", sources=[]
+            )
 
         # LLM sentiment scoring
         if not self._client:
@@ -83,7 +87,7 @@ class RSSLLMSentiment(SentimentInterface):
                     continue
                 # Simple RSS parsing: extract title/description from <item> tags
                 raw_items = re.findall(r"<item>.*?</item>", resp.text, re.DOTALL)
-                for item_xml in raw_items[:self._max_items]:
+                for item_xml in raw_items[: self._max_items]:
                     title = re.search(r"<title>.*?</title>", item_xml)
                     desc = re.search(r"<description>.*?</description>", item_xml)
                     text = ""
@@ -98,11 +102,30 @@ class RSSLLMSentiment(SentimentInterface):
                     items.append(text)
             except Exception:
                 logger.debug("Failed to fetch %s", url)
-        return items[:self._max_items]
+        return items[: self._max_items]
 
     def _keyword_sentiment(self, symbol: str, items: list[str]) -> SentimentScore:
-        bullish_words = ["surge", "rally", "gain", "bullish", "breakthrough", "approval", "adoption", "upgrade"]
-        bearish_words = ["crash", "drop", "loss", "bearish", "ban", "regulation", "hack", "scam", "decline"]
+        bullish_words = [
+            "surge",
+            "rally",
+            "gain",
+            "bullish",
+            "breakthrough",
+            "approval",
+            "adoption",
+            "upgrade",
+        ]
+        bearish_words = [
+            "crash",
+            "drop",
+            "loss",
+            "bearish",
+            "ban",
+            "regulation",
+            "hack",
+            "scam",
+            "decline",
+        ]
         score = 0.0
         for text in items:
             for w in bullish_words:
@@ -112,15 +135,25 @@ class RSSLLMSentiment(SentimentInterface):
                 if w in text.lower():
                     score -= 0.1
         score = max(-1.0, min(1.0, score))
-        return SentimentScore(symbol=symbol, score=score, summary=f"Keyword analysis: {len(items)} items", sources=["rss"])
+        return SentimentScore(
+            symbol=symbol,
+            score=score,
+            summary=f"Keyword analysis: {len(items)} items",
+            sources=["rss"],
+        )
 
     def _llm_sentiment(self, symbol: str, items: list[str]) -> SentimentScore:
         news_text = "\n".join(f"- {item}" for item in items)
-        prompt = 'Analyze sentiment for %s based on these news items. Score from -1.0 (bearish) to 1.0 (bullish).\n\n%s\n\nRespond as JSON: {"score": 0.5, "summary": "brief explanation"}' % (symbol, news_text)
+        prompt = (
+            'Analyze sentiment for %s based on these news items. Score from -1.0 (bearish) to 1.0 (bullish).\n\n%s\n\nRespond as JSON: {"score": 0.5, "summary": "brief explanation"}'
+            % (symbol, news_text)
+        )
 
         try:
             resp = self._client.chat.completions.create(
-                model=self._model, temperature=0.2, max_tokens=200,
+                model=self._model,
+                temperature=0.2,
+                max_tokens=200,
                 messages=[{"role": "user", "content": prompt}],
             )
             raw = resp.choices[0].message.content.strip()
@@ -129,7 +162,9 @@ class RSSLLMSentiment(SentimentInterface):
                 data = json.loads(json_match.group())
                 score = float(data.get("score", 0))
                 summary = data.get("summary", "")
-                result = SentimentScore(symbol=symbol, score=score, summary=summary, sources=["rss", "llm"])
+                result = SentimentScore(
+                    symbol=symbol, score=score, summary=summary, sources=["rss", "llm"]
+                )
                 self._cache[symbol] = (time.time(), result)
                 return result
         except Exception as e:
@@ -142,4 +177,8 @@ class RSSLLMSentiment(SentimentInterface):
 
 
 def register():
-    return {"name": "rss_llm", "class": RSSLLMSentiment, "description": "RSS + LLM sentiment analysis"}
+    return {
+        "name": "rss_llm",
+        "class": RSSLLMSentiment,
+        "description": "RSS + LLM sentiment analysis",
+    }

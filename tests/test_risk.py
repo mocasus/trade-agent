@@ -1,8 +1,15 @@
 """Test risk profiles."""
-from trade_agent.models import Action, Decision, Candle, Ticker, Indicators, MarketContext
+
+from trade_agent.models import (
+    Action,
+    Decision,
+    Candle,
+    Ticker,
+    Indicators,
+    MarketContext,
+)
 from trade_agent.plugins.risk_profile.conservative import ConservativeProfile
 from trade_agent.plugins.risk_profile.moderate import ModerateProfile
-from trade_agent.plugins.risk_profile.aggressive import AggressiveProfile
 
 
 def test_conservative_position_size():
@@ -43,10 +50,17 @@ def test_risk_check_daily_loss():
 def test_stop_loss_atr():
     p = ModerateProfile()
     p.init({})
-    candles = [Candle(timestamp=i, open=100, high=105, low=95, close=100, volume=10) for i in range(20)]
-    ticker = Ticker(symbol="BTC", last_price=100, bid=99, ask=101, volume_24h=100, change_pct_24h=0)
+    candles = [
+        Candle(timestamp=i, open=100, high=105, low=95, close=100, volume=10)
+        for i in range(20)
+    ]
+    ticker = Ticker(
+        symbol="BTC", last_price=100, bid=99, ask=101, volume_24h=100, change_pct_24h=0
+    )
     ind = Indicators(atr=2.0)
-    ctx = MarketContext(symbol="BTC", timeframe="15m", candles=candles, ticker=ticker, indicators=ind)
+    ctx = MarketContext(
+        symbol="BTC", timeframe="15m", candles=candles, ticker=ticker, indicators=ind
+    )
     sl = p.calculate_stop_loss(100.0, ctx)
     assert sl == 97.0
 
