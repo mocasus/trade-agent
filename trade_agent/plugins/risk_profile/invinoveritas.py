@@ -54,11 +54,17 @@ class InvinoveritasProfile(RiskProfileInterface):
 
     def init(self, config: dict[str, Any]) -> None:
         base_name = config.get("base_profile", "moderate")
-        base_cls = _BASE_PROFILES.get(base_name, ModerateProfile)
+        base_cls = _BASE_PROFILES.get(base_name)
+        if base_cls is None:
+            logger.warning(
+                "invinoveritas: unknown base_profile %r, falling back to 'moderate' "
+                "(valid options: %s)", base_name, ", ".join(sorted(_BASE_PROFILES)),
+            )
+            base_cls = ModerateProfile
         self._base = base_cls()
         self._base.init(config)
 
-        iv = config.get("invinoveritas", {})
+        iv = config.get("invinoveritas") or {}
         self._endpoint = iv.get("endpoint", _DEFAULT_ENDPOINT)
         self._api_key = iv.get("api_key", "")
         self._timeout_s = float(iv.get("timeout_s", 8.0))

@@ -98,6 +98,29 @@ def test_position_sizing_delegates_to_base_profile():
     assert p.calculate_position_size(10000, 80) == ref.calculate_position_size(10000, 80)
 
 
+def test_unknown_base_profile_warns_and_falls_back_to_moderate():
+    p = InvinoveritasProfile()
+    with patch("trade_agent.plugins.risk_profile.invinoveritas.logger") as mock_logger:
+        p.init({"base_profile": "agressive"})  # typo, not a real key
+        mock_logger.warning.assert_called_once()
+    from trade_agent.plugins.risk_profile.moderate import ModerateProfile
+
+    ref = ModerateProfile()
+    ref.init({})
+    assert p.calculate_position_size(10000, 80) == ref.calculate_position_size(10000, 80)
+
+
+def test_empty_invinoveritas_config_block_does_not_crash():
+    # config.get("invinoveritas") can legitimately be None (key present, no value set
+    # in YAML) rather than missing entirely -- must not raise on iv.get(...) below.
+    p = InvinoveritasProfile()
+    p.init({"invinoveritas": None})
+    d = Decision(action=Action.BUY, symbol="BTC", confidence=80)
+    with patch("trade_agent.plugins.risk_profile.invinoveritas.httpx.post") as mock_post:
+        assert p.check_risk_rules([], d, 0.0) is True
+        mock_post.assert_not_called()  # no api_key -> fails open before any HTTP call
+
+
 def test_plugin_registers():
     from trade_agent.plugins.risk_profile.invinoveritas import register
 

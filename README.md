@@ -242,6 +242,21 @@ python -m trade_agent.dashboard --config config.yaml  # :8080
 | R:R ratio | 1.5 | 2.0 | 1.5 | Variable | 2.0 |
 | Daily loss limit | 2% | 5% | 10% | 5% | 5% |
 
+### `invinoveritas` profile — sends trade context to a third-party service
+
+Unlike the profiles above, `invinoveritas` wraps a `base_profile` and adds one extra network
+call: on every non-HOLD decision that clears the base profile's own rules, it POSTs your
+`reasoning`, `indicators_used`, `news_factors`, `confidence`, `symbol`, `action`,
+`amount_pct`, open position count, and `daily_pnl_pct` to an external, unaffiliated
+commercial endpoint (`api.babyblueviper.com/review`, configurable via `endpoint`), along
+with your `api_key` in the request header, for an independent pre-trade verification
+verdict. This is **opt-in only** (you must explicitly set `plugins.risk_profile:
+invinoveritas`) and **advisory by default** (a `reject` verdict is logged but doesn't block
+the trade unless you set `enforce: true`), and it **fails open** on any error/timeout/
+unfunded-account response — the wrapped base profile's own rules always apply regardless.
+If you don't want your trading-strategy details (reasoning text, indicators, news factors)
+leaving your machine, don't enable this profile.
+
 ## 🛡️ Safety
 
 - **Paper mode ON by default** — won't trade real money
