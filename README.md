@@ -74,7 +74,7 @@ python -m trade_agent --config config.yaml  # Paper mode default
 - **exchange**: ccxt | paper | bybit_futures
 - **notifier**: telegram | discord | webhook | console
 - **sentiment**: rss_llm | none
-- **risk_profile**: conservative | moderate | aggressive | trailing_stop | kelly_sizing
+- **risk_profile**: conservative | moderate | aggressive | trailing_stop | kelly_sizing | invinoveritas
 
 ## Safety
 
@@ -148,7 +148,7 @@ Core loop only knows interfaces. Swap any plugin without touching core.
 | exchange | `ExchangeInterface` | ccxt, paper, bybit_futures |
 | notifier | `NotifierInterface` | telegram, discord, webhook, console |
 | sentiment | `SentimentInterface` | rss_llm, none |
-| risk_profile | `RiskProfileInterface` | conservative, moderate, aggressive, trailing_stop, kelly_sizing |
+| risk_profile | `RiskProfileInterface` | conservative, moderate, aggressive, trailing_stop, kelly_sizing, invinoveritas |
 | indicators | `IndicatorPluginInterface` | ta (RSI, MACD, EMA, BB, ATR) |
 
 **Custom plugin** — implement interface → place in `~/.trade-agent/plugins/<slot>/`
@@ -299,7 +299,7 @@ trade_agent/
     ├── exchange/         # ccxt, paper, bybit_futures
     ├── notifier/         # telegram, discord, webhook, console
     ├── sentiment/        # rss_llm, none
-    ├── risk_profile/     # conservative, moderate, aggressive, trailing_stop, kelly_sizing
+    ├── risk_profile/     # conservative, moderate, aggressive, trailing_stop, kelly_sizing, invinoveritas
     └── indicators/       # ta (RSI, MACD, EMA, BB, ATR)
 ```
 
