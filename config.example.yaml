@@ -119,6 +119,17 @@ risk:
     min_samples: 10
     default_win_rate: 0.55
     description: Fractional Kelly criterion for position sizing
+  # Optional: set plugins.risk_profile: invinoveritas above to wrap base_profile below
+  # with an independent third-party pre-trade verification check
+  # (https://api.babyblueviper.com/review) on top. Advisory by default (a "reject"
+  # verdict is logged but does not block the trade) -- set enforce: true to actually
+  # veto. Get a free api_key (3 free calls, no funding needed):
+  #   curl -X POST https://api.babyblueviper.com/register -d '{"label":"trade-agent"}'
+  base_profile: moderate
+  invinoveritas:
+    api_key: ${INVINOVERITAS_API_KEY}
+    enforce: false
+    timeout_s: 8
 trading:
   symbols:
   - symbol: BTCUSDT
