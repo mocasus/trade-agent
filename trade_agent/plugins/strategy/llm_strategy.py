@@ -142,7 +142,8 @@ class LLMStrategy(StrategyInterface):
 
     def _parse_decision(self, raw: str, symbol: str) -> Decision:
         # Extract JSON from response (may have markdown wrapping)
-        json_match = re.search(r"\{[^{}]*\}", raw, re.DOTALL)
+        # Handle nested braces (arrays, objects) — not just flat
+        json_match = re.search(r"\{.*\}", raw, re.DOTALL)
         if not json_match:
             return Decision(
                 action=Action.HOLD, symbol=symbol, confidence=0, reasoning=raw

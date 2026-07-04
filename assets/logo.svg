@@ -1,23 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="64" fill="#0D1117"/>
-
-  <!-- Minimal Robot Blob -->
-  <ellipse cx="256" cy="270" rx="130" ry="120" fill="#2ea44f"/>
-
-  <!-- Head -->
-  <ellipse cx="256" cy="195" rx="90" ry="60" fill="#2ea44f"/>
-
-  <!-- Pill Eyes -->
-  <ellipse cx="225" cy="195" rx="28" ry="16" fill="#7ee787"/>
-  <ellipse cx="287" cy="195" rx="28" ry="16" fill="#7ee787"/>
-
-  <!-- Smirk -->
-  <path d="M 235 220 Q 256 238 277 220" stroke="#7ee787" stroke-width="4" fill="none" stroke-linecap="round"/>
-
-  <!-- Trend arrow -->
-  <path d="M 180 340 L 220 310 L 260 325 L 310 300 L 335 310" stroke="#7ee787" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
-
-  <!-- Text -->
-  <text x="256" y="440" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" font-weight="800" fill="#2ea44f" letter-spacing="6">TRADE</text>
-  <text x="256" y="470" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#7ee787" opacity="0.6" letter-spacing="8">BY MMOAA</text>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="120" fill="#16a34a"/>
+  <!-- Green up-trend candle -->
+  <rect x="226" y="140" width="60" height="180" rx="8" fill="#FFFFFF"/>
+  <!-- Wick -->
+  <line x1="256" y1="108" x2="256" y2="140" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <line x1="256" y1="320" x2="256" y2="370" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <!-- Small accent bulb -->
+  <circle cx="256" cy="175" r="14" fill="#16a34a"/>
 </svg>

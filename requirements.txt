@@ -6,7 +6,7 @@ httpx>=0.24
 apscheduler>=3.10
 
 # Indicators (optional — falls back to manual calc if not installed)
-pandas-ta>=0.3
+# pandas_ta>=0.3  # not available for Python 3.11 — using manual fallback
 
 # Telegram notifier (only if using telegram plugin)
 python-telegram-bot>=20.0
