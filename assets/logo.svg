@@ -1,44 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
-  <!-- Background: rounded square, dark -->
-  <rect width="256" height="256" rx="48" fill="#0d1117"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="64" fill="#0D1117"/>
 
-  <!-- Candlestick chart (center-left, green) -->
-  <g transform="translate(48, 52)">
-    <!-- Wick + body: candle 1 (bull) -->
-    <line x1="16" y1="8" x2="16" y2="72" stroke="#2ea44f" stroke-width="3"/>
-    <rect x="8" y="20" width="16" height="36" rx="2" fill="#2ea44f"/>
+  <!-- Minimal Robot Blob -->
+  <ellipse cx="256" cy="270" rx="130" ry="120" fill="#2ea44f"/>
 
-    <!-- Wick + body: candle 2 (bear) -->
-    <line x1="52" y1="4" x2="52" y2="68" stroke="#f85149" stroke-width="3"/>
-    <rect x="44" y="16" width="16" height="40" rx="2" fill="#f85149"/>
+  <!-- Head -->
+  <ellipse cx="256" cy="195" rx="90" ry="60" fill="#2ea44f"/>
 
-    <!-- Wick + body: candle 3 (bull, tall) -->
-    <line x1="88" y1="0" x2="88" y2="80" stroke="#2ea44f" stroke-width="3"/>
-    <rect x="80" y="12" width="16" height="52" rx="2" fill="#2ea44f"/>
+  <!-- Pill Eyes -->
+  <ellipse cx="225" cy="195" rx="28" ry="16" fill="#7ee787"/>
+  <ellipse cx="287" cy="195" rx="28" ry="16" fill="#7ee787"/>
 
-    <!-- Wick + body: candle 4 (bull) -->
-    <line x1="124" y1="20" x2="124" y2="84" stroke="#2ea44f" stroke-width="3"/>
-    <rect x="116" y="36" width="16" height="32" rx="2" fill="#2ea44f"/>
-  </g>
+  <!-- Smirk -->
+  <path d="M 235 220 Q 256 238 277 220" stroke="#7ee787" stroke-width="4" fill="none" stroke-linecap="round"/>
 
-  <!-- AI node graph (bottom-right, accent) -->
-  <g transform="translate(140, 120)">
-    <!-- Connection lines -->
-    <line x1="8" y1="8" x2="40" y2="24" stroke="#58a6ff" stroke-width="2.5" opacity="0.6"/>
-    <line x1="8" y1="8" x2="40" y2="56" stroke="#58a6ff" stroke-width="2.5" opacity="0.6"/>
-    <line x1="40" y1="24" x2="72" y2="40" stroke="#58a6ff" stroke-width="2.5" opacity="0.6"/>
-    <line x1="40" y1="56" x2="72" y2="40" stroke="#58a6ff" stroke-width="2.5" opacity="0.6"/>
+  <!-- Trend arrow -->
+  <path d="M 180 340 L 220 310 L 260 325 L 310 300 L 335 310" stroke="#7ee787" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
 
-    <!-- Nodes -->
-    <circle cx="8" cy="8" r="7" fill="#58a6ff"/>
-    <circle cx="40" cy="24" r="6" fill="#58a6ff"/>
-    <circle cx="40" cy="56" r="6" fill="#58a6ff"/>
-    <circle cx="72" cy="40" r="8" fill="#2ea44f"/>
-  </g>
-
-  <!-- Trend arrow (bottom-left, green) -->
-  <g transform="translate(52, 168)">
-    <path d="M0 20 L20 0 L40 12 L60 4" stroke="#2ea44f" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <path d="M50 -2 L64 -2 L64 12" stroke="#2ea44f" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  </g>
+  <!-- Text -->
+  <text x="256" y="440" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" font-weight="800" fill="#2ea44f" letter-spacing="6">TRADE</text>
+  <text x="256" y="470" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#7ee787" opacity="0.6" letter-spacing="8">BY MMOAA</text>
 </svg>
